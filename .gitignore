@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# macOS
+.DS_Store
+
+# Build output
+build/
+app/.build/
+tools/login_persist/build/
+
+# Test artifacts
+*.app
+*.log
+*.bak
