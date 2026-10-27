@@ -20,9 +20,9 @@ cp "$BIN" "$APP/Contents/MacOS/ExtraWeChat"
 chmod +x "$APP/Contents/MacOS/ExtraWeChat"
 cp "$ROOT/app/Resources/Info.plist" "$APP/Contents/Info.plist"
 
-# SwiftPM resource bundle (menu-bar template icon, etc.)
-RES_BUNDLE="$(dirname "$BIN")/ExtraWeChat_ExtraWeChat.bundle"
-cp -R "$RES_BUNDLE" "$APP/Contents/Resources/"
+# Menu-bar template icon (kept outside SwiftPM's resource bundle so the
+# packaged app is independent of SwiftPM's bundle layout).
+cp "$ROOT/app/Resources/MenuBarIcon.png" "$APP/Contents/Resources/MenuBarIcon.png"
 
 # Python engine (install / patch / locate)
 cp "$ROOT/tools/install.py" "$ROOT/tools/patch_copy.py" "$ROOT/tools/locate_revoke.py" \

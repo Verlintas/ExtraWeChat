@@ -10,8 +10,7 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "ExtraWeChat",
-            path: "Sources/ExtraWeChat",
-            resources: [.process("Resources")]
+            path: "Sources/ExtraWeChat"
         )
     ]
 )

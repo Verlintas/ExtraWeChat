@@ -275,7 +275,9 @@ AXApplication 微信
 - 概览、防撤回、多开、登录态、诊断页面均已截图（见 `docs/screenshots/`）；
 - App 图标使用用户提供的 `WeChat.png` 生成，窗口内概览页和侧栏图标同步使用该图标，
   菜单栏使用同源的模板图标；
-- README 顶部直接引用原始透明 PNG `Github_readmeTop_EWC.png`，未做颜色/透明通道处理。
+- README 顶部直接引用原始透明 PNG `Github_readmeTop_EWC.png`，未做颜色/透明通道处理；
+- 菜单栏图标改为从 `Contents/Resources/MenuBarIcon.png` 直接加载，避免 SwiftPM
+  `Bundle.module` 在不同 CI 打包布局下崩溃。
 
 ### 9.3 未完成
 
