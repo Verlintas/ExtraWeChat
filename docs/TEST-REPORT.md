@@ -285,3 +285,37 @@ AXApplication 微信
 - 主 App 安装后启动 / 真实撤回消息 / 还原的完整验收；
 - 真实账号的 autoauth key 捕获与注入验证；
 - GUI 的 App 管理权限引导在目标系统上的实际点击验证。
+
+---
+
+## 10. v0.1.1：权限与 pkg（2026-10-27）
+
+### 10.1 权限诊断
+
+- 主微信的 `wechat.dylib` 属主为 `root:wheel`、权限 `0644`，普通用户进程无法写入；
+- TCC「App 管理」中 `ExtraWeChat.app` 已启用，但仍会得到
+  `PermissionError: [Errno 13] Permission denied`；
+- 结论：Errno 13 是 Unix 文件权限，不是 TCC；必须通过 root 执行安装/还原。
+
+### 10.2 修复
+
+- GUI 的「安装到主微信 / 还原微信」改为通过 macOS 管理员授权对话框执行
+  （`osascript ... with administrator privileges`）；
+- CLI 文档改为 `sudo python3 tools/install.py ...`；
+- `install.py` 捕获权限错误并输出 App 管理 / root 两层权限说明，不再抛原始 traceback。
+
+### 10.3 pkg
+
+- 新增 `scripts/build_pkg.sh`，生成
+  `build/ExtraWeChat-0.1.1-arm64.pkg`；
+- pkg 安装到 `/Applications/ExtraWeChat.app`，postinstall 清理 quarantine 并设置
+  `root:wheel`；
+- 展开 pkg payload 后 `codesign --verify --deep --strict` 通过；
+- 无 Developer ID Installer 证书，pkg 未签名、未公证；需要右键打开或
+  `sudo installer -pkg ... -target /`。
+
+### 10.4 待验收
+
+- 通过 GUI 管理员授权在真实主微信上完成安装；
+- 真实撤回消息验证；
+- 通过 GUI 管理员授权完成还原。

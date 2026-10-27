@@ -82,6 +82,11 @@ struct ContentView: View {
             get: { model.errorMessage != nil },
             set: { if !$0 { model.errorMessage = nil } }
         )) {
+            if model.needsAppManagementHelp {
+                Button("打开 App 管理设置") {
+                    model.openAppManagementSettings()
+                }
+            }
             Button("好", role: .cancel) { model.errorMessage = nil }
         } message: {
             Text(model.errorMessage ?? "")

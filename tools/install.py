@@ -42,6 +42,37 @@ ORIGINAL_DYLIB = "wechat.dylib.orig"
 ENTITLEMENTS = "entitlements.json"
 
 
+def permission_help(app: str) -> str:
+    return f"""\
+没有权限修改 {app}。
+
+这通常是以下两种情况之一：
+
+1. 微信安装在 /Applications，文件属主是 root:wheel，普通用户无法写入。
+   - GUI：ExtraWeChat 会弹出 macOS 管理员授权对话框，以 root 执行安装/还原；
+   - CLI：请使用 sudo 运行 install.py。
+2. macOS「App 管理」权限（TCC）仍可能拦截：
+   系统设置 → 隐私与安全性 → App 管理 → 打开 ExtraWeChat。
+   如果列表里没有 ExtraWeChat：
+   - 把 ExtraWeChat.app 放到 /Applications 并启动一次；
+   - 再点一次安装，系统应弹出授权提示；
+   - 仍然没有的话，点「+」手动添加 ExtraWeChat.app。
+   命令行使用时，还需要给终端同样的权限。
+
+注意：sudo 不能绕过「App 管理」权限；两步都需要满足。
+"""
+
+
+def is_permission_error(error: BaseException) -> bool:
+    if isinstance(error, PermissionError):
+        return True
+    text = str(error).lower()
+    return ("operation not permitted" in text
+            or "permission denied" in text
+            or "errno 1" in text
+            or "errno 13" in text)
+
+
 def app_info(app: str) -> dict:
     info = L.read_app_info(app)
     if not info:
@@ -277,7 +308,19 @@ def main() -> int:
     p.set_defaults(func=do_status)
 
     args = ap.parse_args()
-    return args.func(args)
+    try:
+        return args.func(args)
+    except SystemExit:
+        raise
+    except Exception as error:
+        if is_permission_error(error):
+            print(permission_help(getattr(args, "app", "/Applications/WeChat.app")),
+                  file=sys.stderr)
+            return 3
+        if isinstance(error, P.Error):
+            print(f"[error] {error}", file=sys.stderr)
+            return 1
+        raise
 
 
 if __name__ == "__main__":

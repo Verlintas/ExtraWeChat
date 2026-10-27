@@ -23,22 +23,33 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 ### 直接下载
 
-从 GitHub Releases 下载 `ExtraWeChat-0.1.0-arm64.zip`，解压后：
+从 GitHub Releases 下载：
+
+- **`ExtraWeChat-0.1.1-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.1-arm64.zip`：便携版，解压后运行。
+
+pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-xattr -dr com.apple.quarantine /Applications/ExtraWeChat.app
-open /Applications/ExtraWeChat.app
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.1-arm64.pkg -target /
 ```
 
-或者右键 App → 打开。当前是 ad-hoc 签名、未公证，Gatekeeper 会提示。
+zip 版首次打开前：
+
+```bash
+xattr -dr com.apple.quarantine ExtraWeChat.app
+open ExtraWeChat.app
+```
 
 ### 从源码构建
 
 ```bash
 ./scripts/build_app.sh
+./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.0-arm64.zip
+#   build/ExtraWeChat-0.1.1-arm64.zip
+#   build/ExtraWeChat-0.1.1-arm64.pkg
 ```
 
 要求：macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
@@ -63,11 +74,15 @@ open /Applications/ExtraWeChat.app
 3. 重新打开微信，让对方发一条消息并撤回，确认消息保留。
 4. 想还原：退出微信 →「还原微信」。
 
-> 如果写入 `/Applications/WeChat.app` 报 Permission denied：
-> 系统设置 → 隐私与安全性 → App 管理，给 ExtraWeChat（或终端）授权；
-> 或把 App 复制到 `~/Applications` 再安装。
+> 修改 `/Applications/WeChat.app` 需要两层权限：
 >
-> macOS 15+ 可能需要给终端/工具「App 管理」权限，`sudo` 不一定能绕过 TCC。
+> 1. **root**：微信由系统安装，属主是 `root:wheel`。GUI 会弹出 macOS 管理员授权对话框；
+>    CLI 需要 `sudo`。
+> 2. **App 管理**：系统设置 → 隐私与安全性 → App 管理 → 打开 ExtraWeChat。
+>    如果列表里没有它，先把 `ExtraWeChat.app` 放到 `/Applications` 并启动一次，再重试；
+>    使用 CLI 时还需要给终端同样的权限。
+>
+> `sudo` 不能绕过「App 管理」权限，两层都需要满足。
 
 ## CLI（可选）
 
@@ -75,9 +90,9 @@ open /Applications/ExtraWeChat.app
 # 只读定位，不改任何文件
 python3 tools/locate_revoke.py --app /Applications/WeChat.app
 
-# 在主微信上安装/还原（需要先退出微信）
-python3 tools/install.py install --app /Applications/WeChat.app --variant silent
-python3 tools/install.py restore --app /Applications/WeChat.app
+# 在主微信上安装/还原（需要先退出微信；需要 root + App 管理权限）
+sudo python3 tools/install.py install --app /Applications/WeChat.app --variant silent
+sudo python3 tools/install.py restore --app /Applications/WeChat.app
 python3 tools/install.py status  --app /Applications/WeChat.app --json
 
 # 在副本上测试

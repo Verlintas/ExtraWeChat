@@ -18,6 +18,13 @@ final class AppModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var toast: String?
 
+    var needsAppManagementHelp: Bool {
+        guard let errorMessage else { return false }
+        return errorMessage.contains("App 管理")
+            || errorMessage.contains("Operation not permitted")
+            || errorMessage.contains("Permission denied")
+    }
+
     let dataDir: URL
     let instancesDir: URL
     let backupDir: URL
@@ -276,6 +283,60 @@ final class AppModel: ObservableObject {
         }.value
     }
 
+    /// Run a bundled Python tool as root through the standard macOS admin
+    /// authorization dialog. WeChat.app lives in /Applications and is owned by
+    /// root:wheel, so a normal user process can never write it even when App
+    /// Management has been granted.
+    func runPythonAsAdmin(_ script: String, _ arguments: [String]) async throws -> String {
+        guard let python = pythonURL else { throw ToolError.missingPython }
+        guard let tools = toolsDir else { throw ToolError.missingTool(script) }
+        let scriptURL = tools.appendingPathComponent(script)
+        guard FileManager.default.fileExists(atPath: scriptURL.path) else {
+            throw ToolError.missingTool(script)
+        }
+
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let command = "HOME=\(shellQuote(home)) "
+            + ([python.path, scriptURL.path] + arguments).map(shellQuote).joined(separator: " ")
+            + " 2>&1"
+        let escaped = command
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        let appleScript = """
+        with timeout of 600 seconds
+            do shell script "\(escaped)" with administrator privileges
+        end timeout
+        """
+
+        return try await Task.detached(priority: .userInitiated) {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+            process.arguments = ["-e", appleScript]
+            let pipe = Pipe()
+            process.standardOutput = pipe
+            process.standardError = pipe
+            do {
+                try process.run()
+            } catch {
+                throw ToolError.failed(error.localizedDescription)
+            }
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            process.waitUntilExit()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            if process.terminationStatus != 0 {
+                if output.contains("-128") || output.localizedCaseInsensitiveContains("User canceled") {
+                    throw ToolError.failed("已取消管理员授权。")
+                }
+                throw ToolError.failed(output.isEmpty ? "管理员命令失败（退出码 \(process.terminationStatus)）" : output)
+            }
+            return output
+        }.value
+    }
+
+    private func shellQuote(_ value: String) -> String {
+        "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+
     func hasDYLDEntitlement(_ appPath: String) -> Bool {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
@@ -310,7 +371,7 @@ final class AppModel: ObservableObject {
             }
             var args = ["install", "--app", self.wechatPath, "--variant", variant]
             if allowDYLD { args.append("--allow-dyld-env") }
-            return try await self.runPython("install.py", args)
+            return try await self.runPythonAsAdmin("install.py", args)
         }
     }
 
@@ -319,7 +380,7 @@ final class AppModel: ObservableObject {
             if self.isRunning(appPath: self.wechatPath) {
                 throw ToolError.failed("微信仍在运行。请先完全退出微信。")
             }
-            return try await self.runPython("install.py", ["restore", "--app", self.wechatPath])
+            return try await self.runPythonAsAdmin("install.py", ["restore", "--app", self.wechatPath])
         }
     }
 

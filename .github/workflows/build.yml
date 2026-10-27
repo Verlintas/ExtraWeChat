@@ -17,18 +17,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build app
-        run: ./scripts/build_app.sh
+      - name: Build app and pkg
+        run: |
+          ./scripts/build_app.sh
+          ./scripts/build_pkg.sh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ExtraWeChat-arm64
-          path: build/ExtraWeChat-*.zip
+          path: |
+            build/ExtraWeChat-*.zip
+            build/ExtraWeChat-*.pkg
           if-no-files-found: error
 
       - name: Upload release asset
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: build/ExtraWeChat-*.zip
+          files: |
+            build/ExtraWeChat-*.zip
+            build/ExtraWeChat-*.pkg

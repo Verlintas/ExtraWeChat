@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+APP="/Applications/ExtraWeChat.app"
+
+# The package is distributed outside the App Store without notarization.
+/usr/bin/xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
+
+# Keep the app owned by root, like other /Applications apps.
+/usr/sbin/chown -R root:wheel "$APP" 2>/dev/null || true
+/bin/chmod -R go-w "$APP" 2>/dev/null || true
+
+echo "[ExtraWeChat] installed to $APP"
+exit 0
