@@ -14,10 +14,10 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 > **当前状态**
 > - 微信 4.1.15（App Store，build 270115，arm64）已适配；
-> - 防撤回已在副本上完成补丁 + 重签 + 签名验证；
+> - 防撤回补丁副本已完成补丁 + 重签 + 签名验证，并实际登录启动；
 > - 多开副本已实际启动验证；
 > - 登录态保持 dylib 已能在副本中安装 hook，真实 key 捕获/注入待账号验收；
-> - 尚未修改 `/Applications/WeChat.app`（安装器已就绪，等你确认/备份后使用）。
+> - `/Applications/WeChat.app` 未被修改；主 App 安装受 macOS「App 管理」TCC 限制，不保证成功。
 
 ## 下载 / 构建 GUI
 
@@ -25,13 +25,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.1-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.1-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.1.2-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.2-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.1-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.2-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -48,8 +48,8 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.1-arm64.zip
-#   build/ExtraWeChat-0.1.1-arm64.pkg
+#   build/ExtraWeChat-0.1.2-arm64.zip
+#   build/ExtraWeChat-0.1.2-arm64.pkg
 ```
 
 要求：macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
@@ -59,20 +59,32 @@ open ExtraWeChat.app
 | 页面 | 功能 |
 | --- | --- |
 | 概览 | 微信版本/构建/渠道、运行状态、防撤回/多开/登录态状态 |
-| 消息防撤回 | silent / keeptip 选择、安装到主微信、还原、创建测试副本 |
+| 消息防撤回 | silent / keeptip、补丁副本创建/启动、安装到主微信、还原 |
 | 多开实例 | 新建/启动/带登录态启动/删除独立实例 |
 | 登录态保持 | 启用 allow-dyld-env、带 dylib 启动、查看 key 状态、清除 key、日志 |
 | 诊断 | Python/tools/dylib 路径、补丁地址、备份状态、复制诊断 |
 
-### 第一次使用
+### 第一次使用（推荐：补丁副本）
 
-1. 完全退出微信（⌘Q，等待 helper 退出）。
-2. 打开 ExtraWeChat →「消息防撤回」→ 选择模式 →「安装到主微信」。
+macOS 的「App 管理」TCC 会拦截对 `/Applications/WeChat.app` 的修改，**即使使用 root /
+管理员授权也不一定成功**。因此推荐先用补丁副本：
+
+1. 完全退出原微信（⌘Q，等待 helper 退出）。
+2. 打开 ExtraWeChat →「消息防撤回」→ 选择模式 →「创建并启动」补丁副本。
+3. 副本位于 `~/Applications/WeChatExtra.app`，使用相同的 bundle ID / 沙盒容器，
+   所以账号和聊天记录是同一份，不需要重新登录。
+4. 打开副本，让对方发一条消息并撤回，确认消息保留。
+
+> 补丁副本不能和原微信同时运行；App Store 更新不会更新副本，微信更新后需要重新创建。
+
+### 可选：修改主微信
+
+1. 完全退出微信。
+2. ExtraWeChat →「消息防撤回」→「安装到主微信」。
    - 会备份原始 `wechat.dylib` 到 `~/Library/Application Support/ExtraWeChat/backups/`；
    - 会逐对象保留 entitlements 并重签；
-   - 失败会拒绝写入，支持「还原微信」。
-3. 重新打开微信，让对方发一条消息并撤回，确认消息保留。
-4. 想还原：退出微信 →「还原微信」。
+   - 失败会自动回滚，支持「还原微信」。
+3. 重新打开微信，验证撤回消息。
 
 > 修改 `/Applications/WeChat.app` 需要两层权限：
 >
@@ -82,7 +94,7 @@ open ExtraWeChat.app
 >    如果列表里没有它，先把 `ExtraWeChat.app` 放到 `/Applications` 并启动一次，再重试；
 >    使用 CLI 时还需要给终端同样的权限。
 >
-> `sudo` 不能绕过「App 管理」权限，两层都需要满足。
+> 注意：即使两层都满足，macOS 仍可能拦截 root 子进程；遇到这种情况请使用补丁副本。
 
 ## CLI（可选）
 
@@ -147,7 +159,7 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 
 | 功能 | 状态 |
 | --- | --- |
-| 防撤回（silent / keeptip） | ✅ 副本验证通过；主 App 安装器已就绪，待你验收 |
+| 防撤回（silent / keeptip） | ✅ 补丁副本实测可启动；主 App 受 App 管理 TCC 限制，不保证成功 |
 | 多开（独立数据目录） | ✅ 副本启动验证通过；GUI 已封装 |
 | 备份 / 还原 / 诊断 | ✅ 已实现 |
 | 菜单栏 / GUI | ✅ 已实现（ad-hoc 签名，未公证） |

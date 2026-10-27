@@ -319,3 +319,28 @@ AXApplication 微信
 - 通过 GUI 管理员授权在真实主微信上完成安装；
 - 真实撤回消息验证；
 - 通过 GUI 管理员授权完成还原。
+
+---
+
+## 11. v0.1.2：TCC 限制与补丁副本（2026-10-28）
+
+### 11.1 主 App 的最终结论
+
+- 普通用户：`Errno 13 Permission denied`（`wechat.dylib` 属主 root:wheel）；
+- 管理员授权后的 root 子进程：仍被 `kTCCServiceSystemPolicyAppBundles` 拦截；
+- 即使「App 管理」中 ExtraWeChat 已启用，`osascript` / `python3` 子进程也不会继承授权；
+- 结论：**不保证能修改 `/Applications/WeChat.app`**，不能把主 App 安装作为唯一方案。
+
+### 11.2 补丁副本（已验证可用）
+
+- 用 `patch_copy.py` 在 `~/Applications/WeChatExtra.app` 创建副本；
+- 保留原 bundle ID / 沙盒容器，账号和聊天记录直接复用；
+- 已应用 `keeptip` 补丁，`codesign --verify --deep --strict` 通过；
+- 在原微信完全退出后成功启动，显示同一账号，可正常进入；
+- 该方案不需要 root、不需要 App 管理、不修改 `/Applications/WeChat.app`。
+
+### 11.3 GUI
+
+- 「消息防撤回」新增补丁副本卡片：创建/更新并启动、启动、退出、Finder 显示；
+- 副本与原微信不能同时运行；
+- 主 App 安装保留为高级选项，并在文档中明确 TCC 限制。

@@ -60,6 +60,9 @@ def permission_help(app: str) -> str:
    命令行使用时，还需要给终端同样的权限。
 
 注意：sudo 不能绕过「App 管理」权限；两步都需要满足。
+
+如果两层权限都满足仍然被 macOS 拦截，请改用 ExtraWeChat 的「补丁副本」模式：
+它不修改 /Applications/WeChat.app，不需要 root 或 App 管理权限。
 """
 
 
@@ -103,6 +106,25 @@ def snapshot_entitlements(app: str) -> dict:
             continue
         out[os.path.relpath(path, app)] = base64.b64encode(ent).decode("ascii")
     return out
+
+
+def original_entitlements(app: str, bdir: str) -> list[tuple[str, bytes | None]] | None:
+    """Load the exact entitlements snapshot taken before the first install."""
+    path = os.path.join(bdir, ENTITLEMENTS)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return None
+    snap: list[tuple[str, bytes | None]] = []
+    for rel, encoded in data.items():
+        target = os.path.join(app, rel)
+        if not os.path.exists(target):
+            continue
+        snap.append((target, base64.b64decode(encoded)))
+    return snap or None
 
 
 def restore_entitlements(app: str) -> list[tuple[str, bytes | None]]:
@@ -228,12 +250,28 @@ def do_install(args) -> int:
         extra["com.apple.security.get-task-allow"] = True
     extra = extra or None
 
-    if args.variant != "none":
-        P.patch_anti_revoke(dylib, located, args.variant)
-    snap = P.prepare_signing(app, strip_sandbox=False, extra=extra)
-    P.sign_all(app, snap)
-    if not verify(app):
-        raise SystemExit("codesign verification failed")
+    orig = os.path.join(bdir, ORIGINAL_DYLIB)
+    try:
+        if args.variant != "none":
+            P.patch_anti_revoke(dylib, located, args.variant)
+        snap = P.prepare_signing(app, strip_sandbox=False, extra=extra)
+        P.sign_all(app, snap)
+        if not verify(app):
+            raise SystemExit("codesign verification failed")
+    except BaseException:
+        # Never leave a patched-but-unsealed app behind. Prefer the original
+        # dylib plus the exact entitlements snapshot; fall back to a fresh
+        # signature if the snapshot is unavailable.
+        if os.path.exists(orig):
+            print("[rollback] restoring original dylib and signature", file=sys.stderr)
+            try:
+                shutil.copy2(orig, dylib)
+                rollback_snap = original_entitlements(app, bdir) or restore_entitlements(app)
+                P.sign_all(app, rollback_snap)
+                verify(app)
+            except Exception as rollback_error:
+                print(f"[rollback] failed: {rollback_error}", file=sys.stderr)
+        raise
     write_manifest(bdir, {
         "app": app,
         "bundle_id": info.get("bundle_id"),
@@ -258,7 +296,7 @@ def do_restore(args) -> int:
         raise SystemExit(f"no backup found at {orig}; reinstall WeChat if needed")
     shutil.copy2(orig, dylib_path(app))
     print(f"[restore] wrote {orig} -> {dylib_path(app)}")
-    snap = restore_entitlements(app)
+    snap = original_entitlements(app, bdir) or restore_entitlements(app)
     P.sign_all(app, snap)
     if not verify(app):
         raise SystemExit("codesign verification failed")

@@ -12,6 +12,10 @@ final class AppModel: ObservableObject {
     @Published var instances: [InstanceInfo] = []
     @Published var loginKeys = LoginKeySummary(main: nil, instances: [])
     @Published var mainSupportsDYLD = false
+    @Published var patchedCopyExists = false
+    @Published var patchedCopyRunning = false
+    @Published var patchedCopyVersion: String?
+    @Published var patchedCopyPatchState: String?
     @Published var busy = false
     @Published var refreshing = false
     @Published var log = ""
@@ -102,6 +106,15 @@ final class AppModel: ObservableObject {
         return nil
     }
 
+    var patchedCopyPath: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications/WeChatExtra.app", isDirectory: true)
+    }
+
+    var patchedCopyMarker: URL {
+        dataDir.appendingPathComponent("patched-copy.json")
+    }
+
     var mainKeyPath: URL {
         let container = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/ExtraWeChat/login_keys.tsv")
@@ -146,6 +159,23 @@ final class AppModel: ObservableObject {
         }
 
         mainSupportsDYLD = hasDYLDEntitlement(appURL.path)
+
+        let copy = patchedCopyPath
+        patchedCopyExists = FileManager.default.fileExists(atPath: copy.path)
+        if patchedCopyExists {
+            patchedCopyVersion = readInfo(copy)?.displayVersion
+            patchedCopyRunning = isRunning(appPath: copy.path)
+            patchedCopyPatchState = nil
+            if let data = try? Data(contentsOf: patchedCopyMarker),
+               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                patchedCopyPatchState = object["variant"] as? String
+            }
+        } else {
+            patchedCopyVersion = nil
+            patchedCopyRunning = false
+            patchedCopyPatchState = nil
+        }
+
         await refreshInstances()
         loginKeys = readLoginKeys()
     }
@@ -400,6 +430,72 @@ final class AppModel: ObservableObject {
         toast = "测试副本：\(output.path)"
     }
 
+    // MARK: - Patched copy (no App Management required)
+
+    func createPatchedCopy(variant: String) async {
+        if isRunning(appPath: wechatPath) {
+            errorMessage = "请先完全退出原微信（⌘Q，并等待 helper 退出），再创建补丁副本。"
+            return
+        }
+        if isRunning(appPath: patchedCopyPath.path) {
+            errorMessage = "补丁副本正在运行。请先退出补丁副本，再更新。"
+            return
+        }
+        let output = patchedCopyPath
+        await perform("正在创建补丁副本…") {
+            try await self.runPython("patch_copy.py", [
+                "--app", self.wechatPath,
+                "--output", output.path,
+                "--variant", variant,
+                "--allow-dyld-env",
+                "--force",
+            ])
+        }
+        if errorMessage == nil {
+            let marker: [String: Any] = ["variant": variant, "path": output.path]
+            if let data = try? JSONSerialization.data(withJSONObject: marker) {
+                try? data.write(to: patchedCopyMarker, options: .atomic)
+            }
+            launchPatchedCopy()
+        }
+    }
+
+    func launchPatchedCopy() {
+        let copy = patchedCopyPath
+        guard FileManager.default.fileExists(atPath: copy.path) else {
+            errorMessage = "还没有补丁副本。请先点击“创建 / 更新并启动”。"
+            return
+        }
+        if isRunning(appPath: wechatPath) {
+            errorMessage = "原微信仍在运行。请先完全退出原微信，再启动补丁副本。"
+            return
+        }
+        if isRunning(appPath: copy.path) {
+            toast = "补丁副本已经在运行"
+            return
+        }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        process.arguments = ["-n", copy.path]
+        do {
+            try process.run()
+            patchedCopyExists = true
+            patchedCopyRunning = true
+            toast = "已启动补丁副本"
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func revealPatchedCopy() {
+        let copy = patchedCopyPath
+        if FileManager.default.fileExists(atPath: copy.path) {
+            NSWorkspace.shared.activateFileViewerSelecting([copy])
+        } else {
+            NSWorkspace.shared.open(copy.deletingLastPathComponent())
+        }
+    }
+
     // MARK: - Instances
 
     func createInstance(name: String, variant: String, loginPersistence: Bool) async {
@@ -547,18 +643,44 @@ final class AppModel: ObservableObject {
         toast = removed > 0 ? "已清除 \(removed) 个 key 文件" : "没有找到已保存的 key"
     }
 
+    private func runningApplications(at appPath: String) -> [NSRunningApplication] {
+        let target = URL(fileURLWithPath: appPath, isDirectory: true)
+            .resolvingSymlinksInPath().standardizedFileURL.path
+        return NSRunningApplication.runningApplications(withBundleIdentifier: "com.tencent.xinWeChat")
+            .filter { app in
+                guard let url = app.bundleURL else { return false }
+                return url.resolvingSymlinksInPath().standardizedFileURL.path == target
+            }
+    }
+
     func quitWeChat() async {
-        let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.tencent.xinWeChat")
+        let apps = runningApplications(at: wechatPath)
         guard !apps.isEmpty else {
-            toast = "微信没有在运行"
+            toast = "原微信没有在运行"
             return
         }
         for app in apps { app.terminate() }
         try? await Task.sleep(nanoseconds: 2_000_000_000)
         if isRunning(appPath: wechatPath) {
-            errorMessage = "微信还没有完全退出，请手动 ⌘Q 并等待 helper 结束。"
+            errorMessage = "原微信还没有完全退出，请手动 ⌘Q 并等待 helper 结束。"
         } else {
-            toast = "微信已退出"
+            toast = "原微信已退出"
+        }
+    }
+
+    func quitPatchedCopy() async {
+        let apps = runningApplications(at: patchedCopyPath.path)
+        guard !apps.isEmpty else {
+            toast = "补丁副本没有在运行"
+            return
+        }
+        for app in apps { app.terminate() }
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        if isRunning(appPath: patchedCopyPath.path) {
+            errorMessage = "补丁副本还没有完全退出，请手动 ⌘Q。"
+        } else {
+            patchedCopyRunning = false
+            toast = "补丁副本已退出"
         }
     }
 

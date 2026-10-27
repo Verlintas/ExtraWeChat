@@ -64,6 +64,17 @@ struct OverviewView: View {
                 Text(patchSubtitle)
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                if model.patchedCopyExists {
+                    HStack {
+                        Text("补丁副本")
+                            .font(.callout)
+                        Spacer()
+                        StatusPill(
+                            text: model.patchedCopyRunning ? "运行中" : "已就绪",
+                            color: model.patchedCopyRunning ? .green : .blue
+                        )
+                    }
+                }
                 Button("打开设置") { model.section = .antiRevoke }
                     .buttonStyle(.link)
             }
@@ -99,7 +110,13 @@ struct OverviewView: View {
                 KeyValueRow(key: "路径", value: model.wechatPath)
                 KeyValueRow(key: "版本", value: model.info?.displayVersion ?? "—")
                 KeyValueRow(key: "渠道", value: model.info?.channelTitle ?? "—")
-                KeyValueRow(key: "运行", value: model.info?.running == true ? "是" : "否")
+                KeyValueRow(key: "原微信", value: model.info?.running == true ? "运行中" : "已退出")
+                if model.patchedCopyExists {
+                    KeyValueRow(
+                        key: "补丁副本",
+                        value: model.patchedCopyRunning ? "运行中" : "已就绪"
+                    )
+                }
             }
         }
     }
@@ -143,11 +160,18 @@ struct OverviewView: View {
         case "silent": return "已开启（静默）"
         case "keeptip": return "已开启（留提示）"
         case "unsupported": return "不支持当前构建"
-        default: return "未开启"
+        default:
+            if let copy = model.patchedCopyPatchState {
+                return "补丁副本已开启（\(copy)）"
+            }
+            return "未开启"
         }
     }
 
     private var patchSubtitle: String {
+        if model.patchedCopyExists && !(model.status?.patch_state == "silent" || model.status?.patch_state == "keeptip") {
+            return model.patchedCopyRunning ? "主微信未修改 · 副本运行中" : "主微信未修改 · 副本已就绪"
+        }
         if let locate = model.locate {
             return "\(locate.generation ?? "") · silent \(formatHex(locate.silent_va))"
         }
@@ -158,7 +182,7 @@ struct OverviewView: View {
         switch model.status?.patch_state ?? "pristine" {
         case "silent", "keeptip": return .green
         case "unsupported": return .red
-        default: return .secondary
+        default: return model.patchedCopyExists ? .green : .secondary
         }
     }
 
@@ -166,7 +190,7 @@ struct OverviewView: View {
         switch model.status?.patch_state ?? "pristine" {
         case "silent", "keeptip": return "已保护"
         case "unsupported": return "不支持"
-        default: return "未保护"
+        default: return model.patchedCopyExists ? "副本已保护" : "未保护"
         }
     }
 }

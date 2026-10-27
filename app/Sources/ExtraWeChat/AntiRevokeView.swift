@@ -2,18 +2,18 @@ import SwiftUI
 
 struct AntiRevokeView: View {
     @EnvironmentObject private var model: AppModel
-    @State private var variant = "silent"
+    @AppStorage("antiRevokeVariant") private var variant = "keeptip"
     @State private var allowDYLD = false
     @State private var showInstallConfirm = false
     @State private var showRestoreConfirm = false
-    @State private var showTestConfirm = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 currentStatus
+                modeCard
+                patchedCopyCard
                 installCard
-                testCard
                 warning
                 if !model.log.isEmpty {
                     Card("最近一次操作", icon: "terminal") {
@@ -39,14 +39,6 @@ struct AntiRevokeView: View {
         } message: {
             Text("将用备份的原始 wechat.dylib 覆盖并重新签名。微信会恢复到未修改状态。")
         }
-        .alert("创建测试副本？", isPresented: $showTestConfirm) {
-            Button("取消", role: .cancel) {}
-            Button("创建") {
-                Task { await model.createTestCopy(variant: variant) }
-            }
-        } message: {
-            Text("会在 ~/Applications/ExtraWeChat/Test 创建一个副本，不会修改主微信。副本仍使用原 bundle ID，启动前需要退出微信。")
-        }
     }
 
     private var currentStatus: some View {
@@ -70,11 +62,87 @@ struct AntiRevokeView: View {
             KeyValueRow(key: "silent 地址", value: formatHex(model.locate?.silent_va))
             KeyValueRow(key: "keeptip 地址", value: formatHex(model.locate?.keeptip_va))
             KeyValueRow(key: "备份", value: model.status?.has_backup == true ? (model.status?.backup_dir ?? "有") : "无")
+            if model.patchedCopyExists {
+                KeyValueRow(
+                    key: "补丁副本",
+                    value: "\(model.patchedCopyPatchState ?? "已创建") · \(model.patchedCopyRunning ? "运行中" : "未运行")"
+                )
+            }
+        }
+    }
+
+    private var modeCard: some View {
+        Card("防撤回模式", icon: "slider.horizontal.3") {
+            Picker("防撤回模式", selection: $variant) {
+                Text("silent（保留消息，不显示撤回提示）").tag("silent")
+                Text("keeptip（保留消息，私聊保留提示）").tag("keeptip")
+            }
+            .pickerStyle(.radioGroup)
+            Text("推荐先用补丁副本验证；确认有效后再决定是否修改主微信。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var patchedCopyCard: some View {
+        Card("补丁副本（推荐，无需 App 管理权限）", icon: "doc.on.doc.fill") {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(copyTitle)
+                        .font(.title3.weight(.semibold))
+                    Text("复制一份微信到 ~/Applications，打补丁并重签；不修改 /Applications/WeChat.app。")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                StatusPill(text: copyPill, color: copyColor)
+            }
+            if model.info?.running == true {
+                WarningBanner(
+                    title: "原微信正在运行",
+                    message: "补丁副本和原微信共用数据容器，不能同时运行。请先完全退出原微信。",
+                    color: .red
+                )
+            }
+            HStack(spacing: 10) {
+                Button {
+                    Task { await model.createPatchedCopy(variant: variant) }
+                } label: {
+                    Label(model.patchedCopyExists ? "更新并启动" : "创建并启动",
+                          systemImage: "wand.and.stars")
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(model.busy || model.info?.running == true || model.patchedCopyRunning)
+
+                Button("启动副本") {
+                    model.launchPatchedCopy()
+                }
+                .disabled(!model.patchedCopyExists || model.patchedCopyRunning || model.info?.running == true)
+
+                Button("退出副本") {
+                    Task { await model.quitPatchedCopy() }
+                }
+                .disabled(!model.patchedCopyRunning)
+
+                Button("在 Finder 显示") {
+                    model.revealPatchedCopy()
+                }
+
+                Spacer()
+            }
+            if model.patchedCopyExists {
+                KeyValueRow(key: "位置", value: model.patchedCopyPath.path)
+                KeyValueRow(key: "版本", value: model.patchedCopyVersion ?? "—")
+            }
+            Text("副本使用相同的 bundle ID 和沙盒容器，所以账号和聊天记录是同一份。App Store 更新不会更新副本；微信更新后需要重新创建。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     private var installCard: some View {
-        Card("安装 / 还原", icon: "wrench.and.screwdriver") {
+        Card("修改主微信（需要 App 管理 + 管理员密码）", icon: "wrench.and.screwdriver") {
             if model.info?.running == true {
                 WarningBanner(
                     title: "微信正在运行",
@@ -82,12 +150,6 @@ struct AntiRevokeView: View {
                     color: .red
                 )
             }
-            Picker("防撤回模式", selection: $variant) {
-                Text("silent（保留消息，不显示撤回提示）").tag("silent")
-                Text("keeptip（保留消息，私聊保留提示）").tag("keeptip")
-            }
-            .pickerStyle(.radioGroup)
-
             Toggle("同时启用登录态保持（allow DYLD）", isOn: $allowDYLD)
                 .toggleStyle(.switch)
             Text("开启后，主微信会允许通过 DYLD 注入登录态 dylib。该权限会降低进程安全性，只建议在你自己的机器上使用。")
@@ -120,23 +182,6 @@ struct AntiRevokeView: View {
         }
     }
 
-    private var testCard: some View {
-        Card("先在副本上测试", icon: "doc.on.doc") {
-            Text("创建一个保留原 bundle ID / 沙盒的副本，先验证补丁和签名；确认可用后再安装到主微信。")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            HStack {
-                Button {
-                    showTestConfirm = true
-                } label: {
-                    Label("创建测试副本", systemImage: "plus.square.on.square")
-                }
-                .disabled(model.busy)
-                Spacer()
-            }
-        }
-    }
-
     private var warning: some View {
         WarningBanner(
             title: "风险提示",
@@ -148,18 +193,42 @@ struct AntiRevokeView: View {
         model.status?.patch_state == "silent" || model.status?.patch_state == "keeptip"
     }
 
+    private var copyTitle: String {
+        let mode = model.patchedCopyPatchState.map { "（\($0)）" } ?? ""
+        if model.patchedCopyRunning { return "补丁副本正在运行\(mode)" }
+        if model.patchedCopyExists { return "补丁副本已就绪\(mode)" }
+        return "还没有补丁副本"
+    }
+
+    private var copyPill: String {
+        if model.patchedCopyRunning { return "运行中" }
+        if model.patchedCopyExists { return "已创建" }
+        return "未创建"
+    }
+
+    private var copyColor: Color {
+        if model.patchedCopyRunning { return .green }
+        if model.patchedCopyExists { return .blue }
+        return .secondary
+    }
+
     private var patchTitle: String {
         switch model.status?.patch_state ?? "pristine" {
-        case "silent": return "消息防撤回已开启（静默）"
-        case "keeptip": return "消息防撤回已开启（留提示）"
+        case "silent": return "主微信已开启（静默）"
+        case "keeptip": return "主微信已开启（留提示）"
         case "unsupported": return "当前构建不支持"
-        default: return "消息防撤回未开启"
+        default:
+            if let copy = model.patchedCopyPatchState {
+                return "补丁副本已开启（\(copy)）"
+            }
+            return "消息防撤回未开启"
         }
     }
 
     private var patchSubtitle: String {
         if let locate = model.locate {
-            return "\(locate.generation ?? "") · newmsgid 字段 0x\(String(locate.field ?? 0, radix: 16))"
+            let suffix = model.patchedCopyExists && !isPatched ? " · 主微信未修改" : ""
+            return "\(locate.generation ?? "") · newmsgid 字段 0x\(String(locate.field ?? 0, radix: 16))\(suffix)"
         }
         return "未检测到可用补丁点"
     }
@@ -168,16 +237,17 @@ struct AntiRevokeView: View {
         switch model.status?.patch_state ?? "pristine" {
         case "silent", "keeptip": return .green
         case "unsupported": return .red
-        default: return .secondary
+        default: return model.patchedCopyExists ? .green : .secondary
         }
     }
 
     private var patchPill: String {
         switch model.status?.patch_state ?? "pristine" {
-        case "silent": return "已保护（silent）"
-        case "keeptip": return "已保护（keeptip）"
+        case "silent": return "主微信已保护（silent）"
+        case "keeptip": return "主微信已保护（keeptip）"
         case "unsupported": return "不支持"
-        default: return "未保护"
+        default:
+            return model.patchedCopyExists ? "副本已保护" : "未保护"
         }
     }
 }
