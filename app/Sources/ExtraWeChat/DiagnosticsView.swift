@@ -44,6 +44,19 @@ struct DiagnosticsView: View {
                     KeyValueRow(key: "主微信 DYLD", value: model.mainSupportsDYLD ? "已允许" : "未允许")
                 }
 
+                Card("补丁副本", icon: "doc.on.doc") {
+                    if model.patchedCopyExists {
+                        KeyValueRow(key: "状态", value: model.patchedCopyRunning ? "运行中" : "已就绪")
+                        KeyValueRow(key: "模式", value: model.patchedCopyModeLabel ?? "—")
+                        KeyValueRow(key: "路径", value: model.patchedCopyPath.path)
+                        KeyValueRow(key: "版本", value: model.patchedCopyVersion ?? "—")
+                        KeyValueRow(key: "主微信版本", value: model.info?.displayVersion ?? "—")
+                        KeyValueRow(key: "需要重建", value: model.patchedCopyNeedsUpdate ? "是" : "否")
+                    } else {
+                        Text("未创建").foregroundStyle(.secondary)
+                    }
+                }
+
                 Card("实例", icon: "square.on.square") {
                     if model.instances.isEmpty {
                         Text("无").foregroundStyle(.secondary)

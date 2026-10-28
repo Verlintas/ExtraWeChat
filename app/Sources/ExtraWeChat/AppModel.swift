@@ -15,6 +15,7 @@ final class AppModel: ObservableObject {
     @Published var patchedCopyExists = false
     @Published var patchedCopyRunning = false
     @Published var patchedCopyVersion: String?
+    @Published var patchedCopyBuild: String?
     @Published var patchedCopyPatchState: String?
     @Published var busy = false
     @Published var refreshing = false
@@ -115,6 +116,22 @@ final class AppModel: ObservableObject {
         dataDir.appendingPathComponent("patched-copy.json")
     }
 
+    var patchedCopyNeedsUpdate: Bool {
+        guard patchedCopyExists,
+              let current = info?.build,
+              let copyBuild = patchedCopyBuild
+        else { return false }
+        return current != copyBuild
+    }
+
+    var patchedCopyModeLabel: String? {
+        switch patchedCopyPatchState {
+        case "silent": return "静默"
+        case "keeptip": return "保留提示"
+        default: return nil
+        }
+    }
+
     var mainKeyPath: URL {
         let container = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/ExtraWeChat/login_keys.tsv")
@@ -163,7 +180,9 @@ final class AppModel: ObservableObject {
         let copy = patchedCopyPath
         patchedCopyExists = FileManager.default.fileExists(atPath: copy.path)
         if patchedCopyExists {
-            patchedCopyVersion = readInfo(copy)?.displayVersion
+            let copyInfo = readInfo(copy)
+            patchedCopyVersion = copyInfo?.displayVersion
+            patchedCopyBuild = copyInfo?.build
             patchedCopyRunning = isRunning(appPath: copy.path)
             patchedCopyPatchState = nil
             if let data = try? Data(contentsOf: patchedCopyMarker),
@@ -172,6 +191,7 @@ final class AppModel: ObservableObject {
             }
         } else {
             patchedCopyVersion = nil
+            patchedCopyBuild = nil
             patchedCopyRunning = false
             patchedCopyPatchState = nil
         }
@@ -463,7 +483,7 @@ final class AppModel: ObservableObject {
     func launchPatchedCopy() {
         let copy = patchedCopyPath
         guard FileManager.default.fileExists(atPath: copy.path) else {
-            errorMessage = "还没有补丁副本。请先点击“创建 / 更新并启动”。"
+            errorMessage = "还没有补丁副本。请先点击“创建防撤回副本”。"
             return
         }
         if isRunning(appPath: wechatPath) {
@@ -471,7 +491,7 @@ final class AppModel: ObservableObject {
             return
         }
         if isRunning(appPath: copy.path) {
-            toast = "补丁副本已经在运行"
+            activatePatchedCopy()
             return
         }
         let process = Process()
@@ -485,6 +505,15 @@ final class AppModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func activatePatchedCopy() {
+        let apps = runningApplications(at: patchedCopyPath.path)
+        guard let app = apps.first else {
+            toast = "补丁副本没有在运行"
+            return
+        }
+        app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
     }
 
     func revealPatchedCopy() {

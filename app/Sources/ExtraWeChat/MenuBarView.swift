@@ -14,30 +14,48 @@ struct MenuBarView: View {
                 Label("打开 ExtraWeChat", systemImage: "macwindow")
             }
 
-            Button {
-                Task { await model.refresh() }
-            } label: {
-                Label("刷新状态", systemImage: "arrow.clockwise")
-            }
-            .disabled(model.busy)
+            Text(statusText)
 
             Divider()
 
-            if let patch = model.status?.patch_state, patch == "silent" || patch == "keeptip" {
+            if model.patchedCopyNeedsUpdate {
                 Button {
-                    Task { await model.restoreAntiRevoke() }
+                    openAntiRevoke()
                 } label: {
-                    Label("还原消息防撤回", systemImage: "arrow.uturn.backward")
+                    Label("更新补丁副本…", systemImage: "arrow.triangle.2.circlepath")
                 }
-                .disabled(model.busy || model.info?.running == true)
+            } else if model.patchedCopyRunning {
+                Button {
+                    model.activatePatchedCopy()
+                } label: {
+                    Label("打开微信副本", systemImage: "arrow.up.forward.app")
+                }
+                Button {
+                    Task { await model.quitPatchedCopy() }
+                } label: {
+                    Label("退出微信副本", systemImage: "power")
+                }
+            } else if model.patchedCopyExists {
+                Button {
+                    model.launchPatchedCopy()
+                } label: {
+                    Label("启动微信副本", systemImage: "play.fill")
+                }
             } else {
                 Button {
-                    Task { await model.installAntiRevoke(variant: "silent", allowDYLD: false) }
+                    openAntiRevoke()
                 } label: {
-                    Label("开启消息防撤回（silent）", systemImage: "checkmark.shield")
+                    Label("创建补丁副本…", systemImage: "wand.and.stars")
                 }
-                .disabled(model.busy || model.info?.running == true)
             }
+
+            Button {
+                openAntiRevoke()
+            } label: {
+                Label("消息防撤回设置…", systemImage: "shield.lefthalf.filled")
+            }
+
+            Divider()
 
             Button {
                 openWindow(id: "main")
@@ -57,9 +75,36 @@ struct MenuBarView: View {
 
             Divider()
 
+            Button {
+                Task { await model.refresh() }
+            } label: {
+                Label("刷新状态", systemImage: "arrow.clockwise")
+            }
+            .disabled(model.busy)
+
             Button("退出 ExtraWeChat") {
                 NSApp.terminate(nil)
             }
         }
+    }
+
+    private var statusText: String {
+        let mode = model.patchedCopyModeLabel.map { " · \($0)" } ?? ""
+        if model.patchedCopyNeedsUpdate {
+            return "补丁副本：需要更新"
+        }
+        if model.patchedCopyRunning {
+            return "补丁副本：运行中\(mode)"
+        }
+        if model.patchedCopyExists {
+            return "补丁副本：已就绪\(mode)"
+        }
+        return "补丁副本：未创建"
+    }
+
+    private func openAntiRevoke() {
+        openWindow(id: "main")
+        NSApp.activate(ignoringOtherApps: true)
+        model.section = .antiRevoke
     }
 }

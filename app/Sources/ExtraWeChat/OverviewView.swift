@@ -42,7 +42,11 @@ struct OverviewView: View {
                     if let info = model.info {
                         StatusPill(text: info.displayVersion, color: .blue)
                         StatusPill(text: info.channelTitle, color: .purple)
-                        StatusPill(text: info.running ? "运行中" : "已退出", color: info.running ? .green : .secondary)
+                        StatusPill(text: info.running ? "原微信运行中" : "原微信已退出",
+                                   color: info.running ? .green : .secondary)
+                        if model.patchedCopyRunning {
+                            StatusPill(text: "副本运行中", color: .green)
+                        }
                     } else {
                         StatusPill(text: "未检测到微信", color: .red)
                     }
@@ -132,9 +136,23 @@ struct OverviewView: View {
                 .disabled(model.busy)
 
                 Button {
+                    if model.patchedCopyRunning {
+                        model.activatePatchedCopy()
+                    } else if model.patchedCopyExists {
+                        model.launchPatchedCopy()
+                    } else {
+                        model.section = .antiRevoke
+                    }
+                } label: {
+                    Label(model.patchedCopyRunning ? "打开副本" : "补丁副本",
+                          systemImage: model.patchedCopyRunning ? "arrow.up.forward.app" : "doc.on.doc")
+                }
+                .disabled(model.busy)
+
+                Button {
                     Task { await model.quitWeChat() }
                 } label: {
-                    Label("退出微信", systemImage: "power")
+                    Label("退出原微信", systemImage: "power")
                 }
                 .disabled(model.info?.running != true)
 

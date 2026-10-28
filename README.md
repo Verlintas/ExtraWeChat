@@ -25,13 +25,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.2-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.2-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.1.3-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.3-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.2-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.3-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -48,8 +48,8 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.2-arm64.zip
-#   build/ExtraWeChat-0.1.2-arm64.pkg
+#   build/ExtraWeChat-0.1.3-arm64.zip
+#   build/ExtraWeChat-0.1.3-arm64.pkg
 ```
 
 要求：macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
