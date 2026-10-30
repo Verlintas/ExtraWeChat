@@ -182,6 +182,17 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 6. GUI 依赖 `/usr/bin/python3` 执行安装/定位脚本；纯 Swift 引擎是后续计划。
 7. 不要分发打补丁后的 `WeChat.app`；只分发 ExtraWeChat 工具本身。
 
+## 官网
+
+官网源码在 [`site/`](site/)，是一个无构建步骤的静态单页：
+
+```bash
+python3 -m http.server 8000 -d site
+open http://localhost:8000
+```
+
+部署到 `verlintas.dev/ExtraWeChat/` 的步骤见 [`site/README.md`](site/README.md)。
+
 ## 文档
 
 - [可行性报告](docs/FEASIBILITY.md)
