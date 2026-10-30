@@ -849,6 +849,20 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func checkForWeChatUpdate() async {
+        let plist = URL(fileURLWithPath: wechatPath)
+            .appendingPathComponent("Contents/Info.plist")
+        guard let data = try? Data(contentsOf: plist),
+              let object = try? PropertyListSerialization.propertyList(
+                from: data, options: [], format: nil
+              ) as? [String: Any],
+              let build = object["CFBundleVersion"] as? String
+        else { return }
+        guard let current = info?.build, build != current else { return }
+        toast = "微信已更新到 \(build)，请重建补丁副本"
+        await refresh()
+    }
+
     func checkProfileUpdates() async {
         busy = true
         log = ""

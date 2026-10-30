@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Verlintas
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import Combine
 import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.colorScheme) private var colorScheme
+    @State private var updateTimer = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
 
     var body: some View {
         NavigationSplitView {
@@ -73,6 +75,9 @@ struct ContentView: View {
         }
         .environment(\.appTheme, model.theme)
         .tint(model.theme.accent)
+        .onReceive(updateTimer) { _ in
+            Task { await model.checkForWeChatUpdate() }
+        }
         .overlay(alignment: .bottom) {
             if let toast = model.toast {
                 Text(toast)

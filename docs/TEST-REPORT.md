@@ -507,3 +507,13 @@ AXApplication 微信
 - CLI `switch_mode.py` 双向切换、locator 状态和签名验证通过；
 - GUI「检查适配更新」按钮和「切换模式」菜单已接入同一工具，待人工点击验收；
 - raw.githubusercontent.com 在当前网络被重置，已改用 `api.github.com` + `Accept: application/vnd.github.raw`。
+
+---
+
+## 18. v0.1.9：微信更新守护（2026-10-30）
+
+- 主窗口每 5 分钟读取 `/Applications/WeChat.app/Contents/Info.plist` 的构建号；
+- 与当前 `model.info.build` 不一致时，弹出 toast 并刷新状态；
+- 刷新后副本卡片和菜单栏显示「副本需要更新」；
+- 不启动额外进程、不上传信息、不需要账号；
+- 定时器只在主窗口存在时运行。
