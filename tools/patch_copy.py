@@ -132,16 +132,23 @@ def patch_entries(dylib: str, entries: list[dict], label: str) -> None:
         data = f.read()
         sl, slice_off, arch = L.macho_slice(data, "auto")
         if arch != "arm64":
-            raise Error(f"{label}: unsupported target architecture {arch}")
+            raise Error(
+                f"{label}: {arch} patching is not supported; ExtraWeChat is "
+                "Apple Silicon only"
+            )
         segments, _sections = L.parse_macho(sl)
         for entry in entries:
             va = int(entry["va"])
             replacement = bytes.fromhex(entry["patch"])
             accepted = [bytes.fromhex(x) for x in entry["expected"]]
+            if not replacement or not accepted:
+                raise Error(f"{label}: empty expected/patch for VA 0x{va:x}")
             off = L.va_to_off(segments, va)
             if off is None:
                 raise Error(f"{label}: VA 0x{va:x} is not file-backed")
             absolute = slice_off + off
+            if absolute + len(replacement) > len(data):
+                raise Error(f"{label}: patch at VA 0x{va:x} exceeds file size")
             f.seek(absolute)
             original = f.read(len(replacement))
             if original == replacement:
@@ -167,7 +174,8 @@ def patch_anti_revoke(dylib: str, located: dict, variant: str) -> None:
         return
     entries = located.get("entries", {}).get(variant, [])
     if not entries:
-        raise Error(f"no {variant} patch entries for this WeChat build")
+        hint = "；该构建只支持 silent，请改用 --variant silent" if variant == "keeptip" else ""
+        raise Error(f"no {variant} patch entries for this WeChat build{hint}")
     patch_entries(dylib, entries, variant)
 
 

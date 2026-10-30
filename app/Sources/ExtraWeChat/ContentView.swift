@@ -199,6 +199,8 @@ struct ContentView: View {
             LoginPersistenceView()
         case .diagnostics:
             DiagnosticsView()
+        case .developer:
+            DeveloperView()
         }
     }
 

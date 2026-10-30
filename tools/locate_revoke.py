@@ -90,8 +90,11 @@ def read_app_info(app: str) -> dict:
     info = os.path.join(app, "Contents", "Info.plist")
     if not os.path.exists(info):
         return {}
-    with open(info, "rb") as f:
-        plist = plistlib.load(f)
+    try:
+        with open(info, "rb") as f:
+            plist = plistlib.load(f)
+    except Exception:
+        return {}
     return {
         "bundle_id": plist.get("CFBundleIdentifier"),
         "short_version": plist.get("CFBundleShortVersionString"),
@@ -123,6 +126,8 @@ def macho_slice(data: bytes, arch: str = "auto") -> tuple[bytes, int, str]:
 
     if endian:
         nfat = struct.unpack(endian + "I", data[4:8])[0]
+        if nfat == 0 or nfat > 64:
+            raise SystemExit(f"invalid fat header: {nfat} architectures")
         wanted = arch
         if wanted == "auto":
             wanted = "arm64" if platform.machine() == "arm64" else "x86_64"
@@ -130,11 +135,14 @@ def macho_slice(data: bytes, arch: str = "auto") -> tuple[bytes, int, str]:
             base = 8 + i * 20
             raw = data[base:base + 20]
             if len(raw) < 20:
-                break
+                raise SystemExit("truncated fat_arch table")
             cputype, _sub, offset, size, _align = struct.unpack(endian + "iIIII", raw)
             name = _cpu_name(cputype & 0xFFFFFFFF)
             if name == wanted:
-                return data[offset:offset + size], offset, name
+                end = offset + size
+                if size == 0 or end > len(data):
+                    raise SystemExit(f"invalid {wanted} slice bounds")
+                return data[offset:end], offset, name
         raise SystemExit(
             f"no {wanted} slice in this binary (available: "
             + ", ".join(
@@ -179,8 +187,10 @@ def parse_macho(sl: bytes) -> tuple[list[dict], list[dict]]:
         if p + 8 > len(sl):
             raise SystemExit("truncated load commands")
         cmd, cmdsize = struct.unpack("<II", sl[p:p + 8])
-        if cmdsize < 8:
+        if cmdsize < 8 or cmdsize % 8 or p + cmdsize > len(sl):
             raise SystemExit("invalid load command size")
+        if cmdsize > 0x40000000:
+            raise SystemExit("load command too large")
         if cmd == LC_SEGMENT_64:
             segname = sl[p + 8:p + 24].rstrip(b"\0").decode(errors="replace")
             vmaddr, vmsize, fileoff, filesize = struct.unpack("<QQQQ", sl[p + 24:p + 56])
@@ -254,8 +264,13 @@ def _entries_from_profile(profile: dict) -> dict[str, list[dict]]:
         for raw in profile.get(variant, []):
             expected = _expected_list(raw)
             patch = raw["asm"].upper()
-            if not expected:
-                continue
+            addr = raw.get("addr", "")
+            if not expected or not patch:
+                raise SystemExit(f"empty expected/asm in {variant} profile entry: {raw}")
+            try:
+                int(addr, 16)
+            except ValueError:
+                raise SystemExit(f"invalid address in {variant} profile entry: {raw}")
             if any(len(x) % 2 for x in expected) or len(patch) % 2:
                 raise SystemExit(f"odd-length hex in {variant} profile entry: {raw}")
             entries.append({
@@ -448,20 +463,27 @@ def locate_with_profile(sl: bytes, segments: list[dict], sections: list[dict],
                         build: str | None, arch: str,
                         use_profile: bool = True,
                         use_signature: bool = True) -> dict:
+    profile_note = ""
     if use_profile and build:
         arch_profile = PROFILES.get("builds", {}).get(str(build), {}).get(arch)
         if arch_profile:
             result = _profile_result(sl, segments, str(build), arch, arch_profile)
             if result is not None:
                 return result
+            profile_note = (
+                f"build {build}/{arch} has a profile, but the bytes do not match; "
+            )
 
     if arch == "arm64" and use_signature:
         result = _signature_result(sl, segments, sections)
         result["build"] = build
+        if profile_note:
+            result["profile_note"] = profile_note.strip()
         return result
 
     raise SystemExit(
-        f"no match for build {build or 'unknown'} on {arch}. "
+        profile_note
+        + f"no match for build {build or 'unknown'} on {arch}. "
         "x86_64 requires an exact build profile; arm64 can fall back to the "
         "geometry scanner. Add the build to tools/revoke_profiles.json."
     )

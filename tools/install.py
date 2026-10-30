@@ -175,7 +175,9 @@ def ensure_backup(app: str) -> str:
         # manifest/backup should already exist; otherwise refuse.
         info = app_info(app)
         located = P.locate_in_dylib(dylib_path(app), build=info.get("build"))
-        if located["silent_state"] != "pristine" or located["keeptip_state"] != "pristine":
+        silent_ok = located["silent_state"] == "pristine"
+        keeptip_ok = located["keeptip_state"] in ("pristine", "unsupported")
+        if not silent_ok or not keeptip_ok:
             raise SystemExit(
                 "wechat.dylib is already patched but no original backup exists; "
                 "reinstall WeChat or restore from a previous backup first"

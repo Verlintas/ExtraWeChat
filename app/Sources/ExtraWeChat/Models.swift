@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Verlintas
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import Darwin
 import Foundation
 import SwiftUI
 
@@ -11,6 +12,7 @@ enum AppSection: String, CaseIterable, Identifiable {
     case instances
     case loginPersistence
     case diagnostics
+    case developer
 
     var id: String { rawValue }
 
@@ -22,6 +24,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         case .instances: return "多开实例"
         case .loginPersistence: return "登录态保持"
         case .diagnostics: return "诊断"
+        case .developer: return "开发者"
         }
     }
 
@@ -33,6 +36,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         case .instances: return "square.on.square"
         case .loginPersistence: return "key.horizontal"
         case .diagnostics: return "stethoscope"
+        case .developer: return "hammer.fill"
         }
     }
 }
@@ -149,4 +153,14 @@ enum ToolError: LocalizedError {
 func formatHex(_ value: UInt64?) -> String {
     guard let value else { return "—" }
     return "0x" + String(value, radix: 16)
+}
+
+extension ProcessInfo {
+    var machineHardwareName: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        return withUnsafeBytes(of: &systemInfo.machine) { bytes in
+            String(cString: bytes.bindMemory(to: CChar.self).baseAddress!)
+        }
+    }
 }

@@ -4,6 +4,7 @@
 import AppKit
 import Combine
 import Foundation
+import UniformTypeIdentifiers
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -30,6 +31,11 @@ final class AppModel: ObservableObject {
     @Published var busy = false
     @Published var refreshing = false
     @Published var log = ""
+    @Published var locateJSON: String?
+    @Published var statusJSON: String?
+    @Published var copyStatusJSON: String?
+    @Published var signatureReport: String?
+    @Published var verifyingSignatures = false
     @Published var errorMessage: String?
     @Published var toast: String?
 
@@ -128,6 +134,20 @@ final class AppModel: ObservableObject {
         dataDir.appendingPathComponent("patched-copy.json")
     }
 
+    var profilesPath: URL? {
+        toolsDir?.appendingPathComponent("revoke_profiles.json")
+    }
+
+    func profileSummary() -> (builds: Int, generations: Int)? {
+        guard let url = profilesPath,
+              let data = try? Data(contentsOf: url),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+        let builds = (object["builds"] as? [String: Any])?.count ?? 0
+        let generations = (object["generations"] as? [Any])?.count ?? 0
+        return (builds, generations)
+    }
+
     var patchedCopyNeedsUpdate: Bool {
         guard patchedCopyExists,
               let current = info?.build,
@@ -195,13 +215,17 @@ final class AppModel: ObservableObject {
 
         do {
             status = nil
+            statusJSON = nil
             if let output = try? await runPython("install.py", ["status", "--app", wechatPath, "--json"]),
                let data = output.data(using: .utf8) {
+                statusJSON = output
                 status = try? JSONDecoder().decode(InstallStatus.self, from: data)
             }
             locate = nil
+            locateJSON = nil
             if let output = try? await runPython("locate_revoke.py", ["--app", wechatPath, "--json"]),
                let data = output.data(using: .utf8) {
+                locateJSON = output
                 locate = try? JSONDecoder().decode(LocateInfo.self, from: data)
             }
         }
@@ -216,6 +240,7 @@ final class AppModel: ObservableObject {
             patchedCopyBuild = copyInfo?.build
             patchedCopyRunning = isRunning(appPath: copy.path)
             patchedCopySupportsDYLD = hasDYLDEntitlement(copy.path)
+            copyStatusJSON = try? await runPython("install.py", ["status", "--app", copy.path, "--json"])
             patchedCopyPatchState = nil
             if let data = try? Data(contentsOf: patchedCopyMarker),
                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
@@ -226,6 +251,7 @@ final class AppModel: ObservableObject {
             patchedCopyBuild = nil
             patchedCopyRunning = false
             patchedCopySupportsDYLD = false
+            copyStatusJSON = nil
             patchedCopyPatchState = nil
         }
 
@@ -767,6 +793,103 @@ final class AppModel: ObservableObject {
     }
 
     // MARK: - Misc
+
+    func developerReport() -> String {
+        let summary = profileSummary()
+        var lines: [String] = []
+        lines.append("ExtraWeChat developer report")
+        lines.append("app_version: \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?")")
+        lines.append("macos: \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        lines.append("arch: \(ProcessInfo.processInfo.machineHardwareName)")
+        lines.append("wechat_path: \(wechatPath)")
+        lines.append("wechat_build: \(info?.build ?? "?")")
+        lines.append("match: \(locate?.match ?? "?")")
+        lines.append("arch_target: \(locate?.arch ?? "?")")
+        lines.append("generation: \(locate?.generation ?? "?")")
+        lines.append("silent_state: \(locate?.silent_state ?? "?")")
+        lines.append("keeptip_state: \(locate?.keeptip_state ?? "?")")
+        lines.append("profile_builds: \(summary?.builds ?? 0)")
+        lines.append("profile_generations: \(summary?.generations ?? 0)")
+        lines.append("copy_exists: \(patchedCopyExists)")
+        lines.append("copy_running: \(patchedCopyRunning)")
+        lines.append("copy_build: \(patchedCopyBuild ?? "?")")
+        lines.append("copy_supports_dyld: \(patchedCopySupportsDYLD)")
+        lines.append("copy_needs_update: \(patchedCopyNeedsUpdate)")
+        lines.append("runtime_dylib: \(bundledRuntimeDylibURL?.path ?? "missing")")
+        lines.append("profiles: \(profilesPath?.path ?? "missing")")
+        lines.append("")
+        lines.append("locate_json:")
+        lines.append(locateJSON ?? "(missing)")
+        lines.append("")
+        lines.append("status_json:")
+        lines.append(statusJSON ?? "(missing)")
+        lines.append("")
+        lines.append("copy_status_json:")
+        lines.append(copyStatusJSON ?? "(missing)")
+        return lines.joined(separator: "\n")
+    }
+
+    func copyDeveloperReport() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(developerReport(), forType: .string)
+        toast = "开发者报告已复制"
+    }
+
+    func exportDeveloperReport() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "ExtraWeChat-diagnostics.json"
+        panel.allowedContentTypes = [.json]
+        panel.canCreateDirectories = true
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            try developerReport().write(to: url, atomically: true, encoding: .utf8)
+            toast = "已导出 \(url.lastPathComponent)"
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func openProfilesFile() {
+        guard let url = profilesPath else {
+            errorMessage = "找不到 revoke_profiles.json"
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
+    func openToolsFolder() {
+        guard let tools = toolsDir else {
+            errorMessage = "找不到 tools 目录"
+            return
+        }
+        NSWorkspace.shared.open(tools)
+    }
+
+    func verifySignatures() async {
+        verifyingSignatures = true
+        defer { verifyingSignatures = false }
+        var lines: [String] = []
+        let targets = [("WeChat", wechatPath), ("Copy", patchedCopyPath.path)]
+        for (label, path) in targets where FileManager.default.fileExists(atPath: path) {
+            let result = Process()
+            result.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
+            result.arguments = ["--verify", "--deep", "--strict", "--verbose=2", path]
+            let pipe = Pipe()
+            result.standardOutput = pipe
+            result.standardError = pipe
+            do {
+                try result.run()
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                result.waitUntilExit()
+                let out = String(data: data, encoding: .utf8) ?? ""
+                lines.append("\(label): \(result.terminationStatus == 0 ? "OK" : "FAILED")")
+                if !out.isEmpty { lines.append(out.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            } catch {
+                lines.append("\(label): ERROR \(error.localizedDescription)")
+            }
+        }
+        signatureReport = lines.joined(separator: "\n")
+    }
 
     func openLog() {
         let fm = FileManager.default

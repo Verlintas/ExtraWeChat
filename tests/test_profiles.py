@@ -55,6 +55,32 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(arm["silent"][0]["asm"], "00008052C0035FD6")
         self.assertGreaterEqual(len(arm["keeptip"]), 3)
 
+    def test_268880_only_silent(self):
+        arm = self.doc["builds"]["268880"]["arm64"]
+        self.assertTrue(arm["silent"])
+        self.assertFalse(arm.get("keeptip"))
+
+    def test_every_profile_has_a_variant(self):
+        for build, arches in self.doc["builds"].items():
+            for arch, profile in arches.items():
+                self.assertIn(arch, ("arm64", "x86_64"), build)
+                self.assertTrue(profile.get("silent") or profile.get("keeptip"),
+                                f"{build}/{arch} has no entries")
+
+    def test_entries_do_not_overlap_within_variant(self):
+        for build, arches in self.doc["builds"].items():
+            for arch, profile in arches.items():
+                for variant in ("silent", "keeptip"):
+                    ranges = []
+                    for entry in profile.get(variant, []):
+                        start = int(entry["addr"], 16)
+                        size = len(entry["asm"]) // 2
+                        ranges.append((start, start + size))
+                    ranges.sort()
+                    for (a_start, a_end), (b_start, _b_end) in zip(ranges, ranges[1:]):
+                        self.assertLessEqual(a_end, b_start,
+                                             f"{build}/{arch}/{variant}: overlapping entries")
+
 
 if __name__ == "__main__":
     unittest.main()
