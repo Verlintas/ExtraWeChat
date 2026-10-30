@@ -1,0 +1,325 @@
+<!doctype html>
+<!-- SPDX-FileCopyrightText: 2026 Verlintas -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05080d">
+  <title>ExtraWeChat — 让撤回的消息留在原地</title>
+  <meta name="description" content="ExtraWeChat 是微信 4.x 的本地增强工具：防撤回、补丁副本、多开、窗口隐私和自定义主题。Apple Silicon，macOS 13+，AGPL-3.0。">
+  <meta property="og:title" content="ExtraWeChat — 让撤回的消息留在原地">
+  <meta property="og:description" content="微信 4.x 本地增强工具：防撤回、补丁副本、多开、窗口隐私和自定义主题。Apple Silicon，macOS 13+，AGPL-3.0。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://verlintas.dev/ExtraWeChat/">
+  <meta property="og:image" content="https://verlintas.dev/ExtraWeChat/assets/screenshots/overview.webp">
+  <link rel="canonical" href="https://verlintas.dev/ExtraWeChat/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/icon-128.png">
+  <link rel="apple-touch-icon" href="assets/icon-256.png">
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="assets/style.css">
+  <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true">
+    <span class="aurora-a"></span>
+    <span class="aurora-b"></span>
+    <span class="aurora-c"></span>
+  </div>
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top" aria-label="ExtraWeChat 首页">
+      <img src="assets/icon-256.png" alt="" width="30" height="30">
+      <span>ExtraWeChat</span>
+    </a>
+    <nav class="nav-links" aria-label="页面导航">
+      <a href="#features">功能</a>
+      <a href="#screens">截图</a>
+      <a href="#compatibility">兼容性</a>
+      <a href="#safety">安全</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="https://github.com/Verlintas/ExtraWeChat" target="_blank" rel="noreferrer">GitHub</a>
+      <a class="btn btn-primary btn-sm" href="https://github.com/Verlintas/ExtraWeChat/releases/latest" target="_blank" rel="noreferrer">下载</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> Apple Silicon · macOS 13+ · AGPL-3.0</div>
+        <h1>让撤回的消息，<br><span class="gradient-text">留在原地。</span></h1>
+        <p class="lede">
+          ExtraWeChat 是微信 4.x 的本地增强工具。防撤回、补丁副本、多开、窗口隐私和自定义主题，
+          全部在你自己机器上完成。原始微信不动，聊天内容不上传。
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/Verlintas/ExtraWeChat/releases/latest" target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            下载 pkg
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/Verlintas/ExtraWeChat" target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.8c.85 0 1.7.11 2.5.33 1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" fill="currentColor"/></svg>
+            查看 GitHub
+          </a>
+          <a class="btn btn-quiet" href="#screens">先看截图 <span aria-hidden="true">↘</span></a>
+        </div>
+        <div class="micro">
+          <span>42 个微信构建</span><span>3 代自动定位</span><span>0 上传</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="glow"></div>
+        <div class="window">
+          <img src="assets/screenshots/overview.webp" alt="ExtraWeChat 概览界面" width="1600" height="1146">
+        </div>
+        <div class="float-chip chip-a"><span class="chip-dot"></span> 防撤回已开启</div>
+        <div class="float-chip chip-b"><span class="chip-dot"></span> 副本运行中</div>
+        <div class="float-chip chip-c">42 个构建适配</div>
+      </div>
+    </section>
+
+    <section class="stats wrap reveal" aria-label="项目数据">
+      <div class="stat"><strong>42</strong><span>个微信 4.x 构建内置适配</span></div>
+      <div class="stat"><strong>3</strong><span>代 arm64 几何签名自动定位</span></div>
+      <div class="stat"><strong>5</strong><span>套界面主题</span></div>
+      <div class="stat"><strong>0</strong><span>聊天内容上传 / 账号系统</span></div>
+    </section>
+
+    <section class="section wrap" id="features">
+      <div class="section-head reveal">
+        <span class="kicker">FEATURES</span>
+        <h2>该有的本地增强，<br>都在这里。</h2>
+        <p>不做机器人，不碰服务端协议。只在你自己的 Mac 和补丁副本里工作。</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m8.6 12 2.3 2.3 4.6-4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>防撤回</h3>
+          <p>别人撤回后，原消息继续留在聊天里。支持静默模式和保留提示模式，切换约 1 秒。</p>
+          <span class="tag">silent / keeptip</span>
+        </article>
+
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+          </div>
+          <h3>补丁副本</h3>
+          <p>复制到 <code>~/Applications</code> 后打补丁。不修改系统微信，不需要 root 或 App 管理权限；支持一键备份/恢复。</p>
+          <span class="tag">推荐路径</span>
+        </article>
+
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="4" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+          </div>
+          <h3>多开实例</h3>
+          <p>每个实例使用独立 bundle ID 和数据目录，可以和原微信并存，单独登录。</p>
+          <span class="tag">独立数据</span>
+        </article>
+
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12s3.4-6 9-6 9 6 9 6-3.4 6-9 6-9-6-9-6Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m4 4 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </div>
+          <h3>窗口隐私</h3>
+          <p>录屏或共享屏幕时隐藏微信窗口，包括主窗口、聊天窗口和图片查看器。</p>
+          <span class="tag">runtime dylib</span>
+        </article>
+
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3M12 12v9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>多版本适配</h3>
+          <p>内置 42 个微信 4.x 构建；适配表可远程更新，未收录的构建还能用几何签名自动定位。</p>
+          <span class="tag">4.1.10 → 4.1.15.55</span>
+        </article>
+
+        <article class="feature reveal">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.7 0 2.2-1.2 1.4-2.2-.7-.9-.2-2.1 1-2.1h1.4A4.2 4.2 0 0 0 20 12.5 9 9 0 0 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7.8" cy="11.5" r="1" fill="currentColor"/><circle cx="10.2" cy="7.8" r="1" fill="currentColor"/><circle cx="14.5" cy="7.8" r="1" fill="currentColor"/><circle cx="16.8" cy="11.5" r="1" fill="currentColor"/></svg>
+          </div>
+          <h3>主题与菜单栏</h3>
+          <p>5 套主题跟随侧栏、卡片和背景；菜单栏快速启动、打开或退出副本。</p>
+          <span class="tag">微信绿 / 深海蓝 / 日落橙 …</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section wrap split" id="how">
+      <div class="split-copy reveal">
+        <span class="kicker">HOW IT WORKS</span>
+        <h2>三步，<br>把补丁留在副本里。</h2>
+        <p>
+          主微信保持原样。ExtraWeChat 在用户目录创建一份补丁副本，
+          重签后启动。账号和聊天数据与原微信共用同一份容器，所以不需要重新登录。
+        </p>
+        <a class="text-link" href="https://github.com/Verlintas/ExtraWeChat/blob/main/docs/ENHANCEMENTS.md" target="_blank" rel="noreferrer">了解运行时组件 <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><span class="step-num">01</span><div><h3>退出原微信</h3><p>⌘Q 并等待 helper 退出。副本与原微信不能同时运行。</p></div></div>
+        <div class="step reveal"><span class="step-num">02</span><div><h3>创建补丁副本</h3><p>选择静默或保留提示，ExtraWeChat 复制、打补丁并重签。</p></div></div>
+        <div class="step reveal"><span class="step-num">03</span><div><h3>正常使用</h3><p>从副本登录同一账号，聊天记录还在；需要时从备份恢复 App，微信更新后一键重建。</p></div></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="screens">
+      <div class="section-head reveal">
+        <span class="kicker">SCREENSHOTS</span>
+        <h2>长这样。</h2>
+        <p>深色界面、彩色主题、状态一目了然。</p>
+      </div>
+      <div class="gallery">
+        <figure class="shot reveal wide">
+          <img src="assets/screenshots/overview.webp" alt="ExtraWeChat 概览页" decoding="async" width="1600" height="1146">
+          <figcaption><strong>概览</strong><span>版本、运行状态、补丁副本和快捷操作</span></figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <img src="assets/screenshots/anti-revoke.webp" alt="ExtraWeChat 防撤回页" decoding="async" width="1600" height="1172">
+          <figcaption><strong>防撤回</strong><span>模式选择、副本状态和主操作</span></figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <img src="assets/screenshots/settings.webp" alt="ExtraWeChat 设置与主题" decoding="async" width="1504" height="1400">
+          <figcaption><strong>设置 / 主题</strong><span>5 套主题和运行时信息</span></figcaption>
+        </figure>
+        <figure class="shot reveal wide">
+          <img src="assets/screenshots/enhancements.webp" alt="ExtraWeChat 增强与窗口隐私" decoding="async" width="1600" height="1146">
+          <figcaption><strong>增强 / 备份</strong><span>窗口隐私、副本备份和后续功能规划</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section wrap" id="compatibility">
+      <div class="section-head reveal">
+        <span class="kicker">COMPATIBILITY</span>
+        <h2>按构建号适配，<br>不靠猜。</h2>
+        <p>每个补丁点写入前都会校验原始字节。构建号不匹配就拒绝，不会盲写。</p>
+      </div>
+      <div class="compat-panel reveal">
+        <div class="compat-top">
+          <div>
+            <span class="badge">Apple Silicon</span>
+            <span class="badge">macOS 13+</span>
+            <span class="badge">微信 4.x</span>
+          </div>
+          <a class="text-link" href="https://github.com/Verlintas/ExtraWeChat/blob/main/docs/COMPATIBILITY.md" target="_blank" rel="noreferrer">完整兼容性表 →</a>
+        </div>
+        <div class="compat-grid">
+          <div class="compat-card"><strong>4.1.10 – 4.1.11</strong><p>268575 · 268596 · 268597 · 268599 · 268601 · 268602 · 268831 · 268849 · 268850 · 268851 · 269077 · 269079 · 269110 · 269111 · 269136</p><em>268880 仅 silent</em></div>
+          <div class="compat-card"><strong>4.1.12</strong><p>269332 · 269333 · 269334 · 269338 · 269340 · 269341</p><em>delta 0x7a0</em></div>
+          <div class="compat-card"><strong>4.1.13+</strong><p>269574 – 269579 · 269619 · 269624 · 269626 – 269628 · 269631 · 270090 · 270100 · 270102 · <b>270115（实测）</b> · 270132 · 270134 · 270135</p><em>42 个构建中的主流路径</em></div>
+          <div class="compat-card special"><strong>特殊 / 自动定位</strong><p>269602 使用分类函数桩；未收录的同代构建使用 3 代 arm64 几何签名自动定位。</p><em>命中多处会拒绝猜测</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="safety">
+      <div class="section-head reveal">
+        <span class="kicker">SAFETY &amp; LIMITS</span>
+        <h2>本地、可回退、<br>但不承诺零风险。</h2>
+      </div>
+      <div class="safety-grid">
+        <div class="safety-card good reveal">
+          <div class="safety-icon">✓</div>
+          <h3>不碰原微信</h3>
+          <p>默认只修改 <code>~/Applications/WeChatExtra.app</code>。原 <code>/Applications/WeChat.app</code> 保持原样。</p>
+        </div>
+        <div class="safety-card good reveal">
+          <div class="safety-icon">◎</div>
+          <h3>不需要 root / SIP</h3>
+          <p>没有内核扩展，不关闭 SIP，不上传聊天内容，不需要账号系统。</p>
+        </div>
+        <div class="safety-card warn reveal">
+          <div class="safety-icon">!</div>
+          <h3>仍然有账号风险</h3>
+          <p>修改客户端违反腾讯用户协议。不要在主号上反复测试，也不要分发打补丁后的微信 App。</p>
+        </div>
+      </div>
+      <p class="disclaimer reveal">ExtraWeChat 与腾讯无关，不是微信官方产品。使用前请自行备份重要数据，并阅读仓库中的风险说明。</p>
+    </section>
+
+    <section class="section wrap" id="faq">
+      <div class="section-head reveal">
+        <span class="kicker">FAQ</span>
+        <h2>你可能想知道。</h2>
+      </div>
+      <div class="faq reveal">
+        <details>
+          <summary>会不会封号？</summary>
+          <p>不能保证不封。防撤回、多开和窗口隐私都只改本地客户端，但修改微信违反腾讯用户协议，存在账号风险。建议先在小号或次要账号上验证，不要在主力账号上反复测试。</p>
+        </details>
+        <details>
+          <summary>为什么改副本，而不是直接改 /Applications/WeChat.app？</summary>
+          <p>macOS 的「App 管理」TCC 会拦截对系统应用的修改，即使使用 root 也不一定成功。补丁副本在用户目录，不需要 root 或 App 管理权限，也不需要关闭 SIP。</p>
+        </details>
+        <details>
+          <summary>补丁副本和原微信能同时运行吗？</summary>
+          <p>不能。两者共用同一个 bundle ID 和沙盒容器，同时运行会冲突。启动副本前请完全退出原微信。</p>
+        </details>
+        <details>
+          <summary>微信更新后怎么办？</summary>
+          <p>打开 ExtraWeChat →「消息防撤回」。如果检测到主微信构建号变化，会提示副本需要更新；点「更新并启动」重建即可，聊天记录不会丢失。重建前也可以先在「增强 → 副本备份」留一份 App 备份。</p>
+        </details>
+
+        <details>
+          <summary>备份会包含聊天记录吗？</summary>
+          <p>不会。副本备份只复制 <code>~/Applications/WeChatExtra.app</code>，不包含聊天数据、媒体或登录 key。恢复也只替换 App，不动共享的微信数据容器。</p>
+        </details>
+        <details>
+          <summary>支持哪些微信和 macOS？</summary>
+          <p>目前只支持 Apple Silicon（arm64），macOS 13 及以上。微信 4.x 内置 42 个构建，覆盖 4.1.10 到 4.1.15.55；未收录的同代构建可自动定位。Intel、微信 3.8.x 和 4.1.7 不支持。</p>
+        </details>
+        <details>
+          <summary>会上传聊天内容吗？</summary>
+          <p>不会。窗口隐私在微信进程内完成；补丁和签名都在本机执行，没有账号系统和遥测。登录态保持仍是实验功能，不保证服务端接受。</p>
+        </details>
+        <details>
+          <summary>有自动领红包吗？</summary>
+          <p>没有。自动领红包涉及资金自动化，账号和维护风险都高，不放进默认发布计划。自定义撤回提示、撤回记录和关键词提醒仍在规划中。</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="cta-panel wrap reveal">
+      <img src="assets/icon-256.png" alt="" width="72" height="72">
+      <div>
+        <span class="kicker">GET STARTED</span>
+        <h2>把撤回的消息，<br>留在原地。</h2>
+        <p>下载 pkg，退出微信，创建补丁副本。三步之后，原消息不会再消失。</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://github.com/Verlintas/ExtraWeChat/releases/latest" target="_blank" rel="noreferrer">下载最新版</a>
+        <a class="btn btn-ghost" href="https://github.com/Verlintas/ExtraWeChat" target="_blank" rel="noreferrer">Star on GitHub</a>
+        <span class="cta-note">Apple Silicon · macOS 13+ · AGPL-3.0-only</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <div class="footer-brand">
+      <img src="assets/icon-256.png" alt="" width="34" height="34">
+      <div><strong>ExtraWeChat</strong><span>微信 4.x 本地增强工具</span></div>
+    </div>
+    <div class="footer-cols">
+      <div><h4>产品</h4><a href="https://github.com/Verlintas/ExtraWeChat/releases/latest" target="_blank" rel="noreferrer">下载</a><a href="https://github.com/Verlintas/ExtraWeChat/releases" target="_blank" rel="noreferrer">版本记录</a><a href="https://github.com/Verlintas/ExtraWeChat/issues" target="_blank" rel="noreferrer">反馈问题</a></div>
+      <div><h4>文档</h4><a href="https://github.com/Verlintas/ExtraWeChat/blob/main/docs/COMPATIBILITY.md" target="_blank" rel="noreferrer">兼容性</a><a href="https://github.com/Verlintas/ExtraWeChat/blob/main/docs/ENHANCEMENTS.md" target="_blank" rel="noreferrer">增强功能</a><a href="https://github.com/Verlintas/ExtraWeChat/blob/main/docs/LOGIN-PERSISTENCE.md" target="_blank" rel="noreferrer">登录态保持</a></div>
+      <div><h4>项目</h4><a href="https://github.com/Verlintas/ExtraWeChat" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/Verlintas/ExtraWeChat/blob/main/LICENSE" target="_blank" rel="noreferrer">AGPL-3.0-only</a><a href="https://github.com/Verlintas/ExtraWeChat/blob/main/NOTICE.md" target="_blank" rel="noreferrer">致谢</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Verlintas. Not affiliated with Tencent.</span><span>微信是腾讯的商标；本项目与腾讯无关。</span></div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" aria-label="关闭">×</button>
+    <img alt="">
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
