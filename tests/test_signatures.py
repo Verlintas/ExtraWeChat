@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 """Self-consistency checks for the anti-revoke geometry table.
 
 Run: python3 -m unittest discover -s tests -v

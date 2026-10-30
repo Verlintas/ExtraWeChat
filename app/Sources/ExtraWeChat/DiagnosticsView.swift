@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Verlintas
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import SwiftUI
 
 struct DiagnosticsView: View {
@@ -35,6 +38,8 @@ struct DiagnosticsView: View {
 
                 Card("补丁状态", icon: "shield.lefthalf.filled") {
                     KeyValueRow(key: "patch", value: model.status?.patch_state ?? "—")
+                    KeyValueRow(key: "adaptation", value: model.locate?.match == "profile" ? "内置构建配置" : model.locate?.match == "signature" ? "几何签名自动定位" : "—")
+                    KeyValueRow(key: "arch", value: model.locate?.arch ?? "—")
                     KeyValueRow(key: "generation", value: model.locate?.generation ?? "—")
                     KeyValueRow(key: "silent VA", value: formatHex(model.locate?.silent_va))
                     KeyValueRow(key: "keeptip VA", value: formatHex(model.locate?.keeptip_va))

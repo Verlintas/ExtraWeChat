@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Verlintas
+// SPDX-License-Identifier: AGPL-3.0-only
+
 //
 //  login_persist.mm
 //  ExtraWeChat — experimental login-state persistence for WeChat 4.x.

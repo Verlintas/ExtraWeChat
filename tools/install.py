@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 install.py — install/restore ExtraWeChat's binary patches on a real WeChat.app.
 
@@ -171,7 +173,8 @@ def ensure_backup(app: str) -> str:
     if not os.path.exists(orig):
         # Only back up a pristine dylib. If it is already patched by us, the
         # manifest/backup should already exist; otherwise refuse.
-        located = P.locate_in_dylib(dylib_path(app))
+        info = app_info(app)
+        located = P.locate_in_dylib(dylib_path(app), build=info.get("build"))
         if located["silent_state"] != "pristine" or located["keeptip_state"] != "pristine":
             raise SystemExit(
                 "wechat.dylib is already patched but no original backup exists; "
@@ -203,9 +206,11 @@ def current_state(app: str) -> dict:
         "running": running(app),
     }
     try:
-        located = P.locate_in_dylib(dylib)
+        located = P.locate_in_dylib(dylib, build=info.get("build"))
         result.update({
             "generation": located["generation"],
+            "match": located.get("match"),
+            "arch": located.get("arch"),
             "silent_va": f"{located['silent_va']:x}",
             "silent_state": located["silent_state"],
             "keeptip_state": located["keeptip_state"],
@@ -238,7 +243,7 @@ def do_install(args) -> int:
         raise SystemExit("WeChat is running; quit it completely before install")
     info = app_info(app)
     dylib = dylib_path(app)
-    located = P.locate_in_dylib(dylib)
+    located = P.locate_in_dylib(dylib, build=info.get("build"))
     bdir = ensure_backup(app)
     print(f"[info] {info.get('short_version')} build {info.get('build')} ({info.get('channel')})")
     print(f"[info] variant={args.variant} allow_dyld_env={args.allow_dyld_env}")

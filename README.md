@@ -13,7 +13,7 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 ![ExtraWeChat 概览](docs/screenshots/overview.png)
 
 > **当前状态**
-> - 微信 4.1.15（App Store，build 270115，arm64）已适配；
+> - 微信 4.x arm64：42 个构建内置适配，270115（4.1.15）实测；
 > - 防撤回补丁副本已完成补丁 + 重签 + 签名验证，并实际登录启动；
 > - 多开副本已实际启动验证；
 > - 登录态保持 dylib 已能在副本中安装 hook，真实 key 捕获/注入待账号验收；
@@ -25,13 +25,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.3-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.3-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.1.4-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.4-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.3-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.4-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -48,11 +48,11 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.3-arm64.zip
-#   build/ExtraWeChat-0.1.3-arm64.pkg
+#   build/ExtraWeChat-0.1.4-arm64.zip
+#   build/ExtraWeChat-0.1.4-arm64.pkg
 ```
 
-要求：macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
+要求：**Apple Silicon（arm64）**、macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
 
 ## GUI 功能
 
@@ -155,11 +155,11 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 - 「锁定状态退出」是微信的安全策略，服务端仍可能拒绝保存的 key；不能承诺稳定免验证。
 - 正式版本应迁移到 Keychain；当前为原型。
 
-## 支持矩阵（4.1.15 / 270115）
+## 支持矩阵（微信 4.x / Apple Silicon）
 
 | 功能 | 状态 |
 | --- | --- |
-| 防撤回（silent / keeptip） | ✅ 补丁副本实测可启动；主 App 受 App 管理 TCC 限制，不保证成功 |
+| 防撤回（silent / keeptip） | ✅ 42 个 4.x arm64 构建内置适配 + 3 代自动定位；270115 实测撤回 |
 | 多开（独立数据目录） | ✅ 副本启动验证通过；GUI 已封装 |
 | 备份 / 还原 / 诊断 | ✅ 已实现 |
 | 菜单栏 / GUI | ✅ 已实现（ad-hoc 签名，未公证） |
@@ -172,10 +172,20 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 
 1. 微信更新会整包替换并清除补丁；更新后需重新安装。
 2. 修改微信违反腾讯用户协议，存在账号风险；只在本人设备、本人账号使用。
-3. 当前只适配 4.1.15（270115）；其他构建可尝试只读定位，未验证勿直接安装。
-4. 登录态保持不保证服务端接受；失败时仍会要求手机确认。
-5. GUI 依赖 `/usr/bin/python3` 执行安装/定位脚本；纯 Swift 引擎是后续计划。
-6. 不要分发打补丁后的 `WeChat.app`；只分发 ExtraWeChat 工具本身。
+3. 仅支持 Apple Silicon（arm64）。内置 42 个 4.x 构建；未列出的同代构建可自动定位，新代需要更新适配表。
+4. 不支持 Intel、微信 3.8.x、4.1.7（逻辑在主程序）。
+5. 登录态保持不保证服务端接受；失败时仍会要求手机确认。
+6. GUI 依赖 `/usr/bin/python3` 执行安装/定位脚本；纯 Swift 引擎是后续计划。
+7. 不要分发打补丁后的 `WeChat.app`；只分发 ExtraWeChat 工具本身。
+
+## 文档
+
+- [可行性报告](docs/FEASIBILITY.md)
+- [微信 / macOS 兼容性](docs/COMPATIBILITY.md)
+- [270115 补丁点](docs/PATCH-270115.md)
+- [测试报告](docs/TEST-REPORT.md)
+- [登录态保持](docs/LOGIN-PERSISTENCE.md)
+- [路线图](docs/ROADMAP.md)
 
 ## 目录
 
@@ -194,4 +204,5 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 - [sunnyyoung/WeChatTweak](https://github.com/sunnyyoung/WeChatTweak)（AGPL-3.0）
 - 旧项目 [TKkk-iOSer/WeChatPlugin-MacOS](https://github.com/TKkk-iOSer/WeChatPlugin-MacOS)（MIT）
 
-本项目代码以 **AGPL-3.0** 发布。详见 [`LICENSE`](LICENSE) 和 [`NOTICE.md`](NOTICE.md)。
+本项目代码以 **AGPL-3.0-only** 发布。源文件带 SPDX 版权/许可头；详见
+[`LICENSE`](LICENSE) 和 [`NOTICE.md`](NOTICE.md)。

@@ -1,0 +1,1374 @@
+{
+  "_license": "AGPL-3.0-only",
+  "_copyright": "2026 Verlintas; build data derived from zengtianli/WeChatTweak (AGPL-3.0)",
+  "_comment": "微信 4.x 防撤回构建配置。优先按 CFBundleVersion 精确匹配；未收录的构建再用 arm64 几何签名自动定位。",
+  "_source": "构建地址来自 zengtianli/WeChatTweak config.json（AGPL-3.0）；270115 为本项目实测。",
+  "off_cbz": "0x270",
+  "generations": [
+    {
+      "name": "4.1.13 (269574+)",
+      "builds": "269574-269626",
+      "cbz": "40100034",
+      "b": "82000014",
+      "delta": "0x7a0",
+      "str_x0": "60E600F9",
+      "str_xzr": "7FE600F9",
+      "field": "0x1c8"
+    },
+    {
+      "name": "4.1.12 (269332-269341)",
+      "builds": "269332-269341",
+      "cbz": "40100034",
+      "b": "82000014",
+      "delta": "0x7a0",
+      "str_x0": "60CE00F9",
+      "str_xzr": "7FCE00F9",
+      "field": "0x198"
+    },
+    {
+      "name": "4.1.10-4.1.11 (<=269136)",
+      "builds": "268575-269136",
+      "cbz": "E00F0034",
+      "b": "7F000014",
+      "delta": "0x794",
+      "str_x0": "60B600F9",
+      "str_xzr": "7FB600F9",
+      "field": "0x168"
+    }
+  ],
+  "builds": {
+    "268575": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "45d05e4",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "45d05e4",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "45d0d78",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268596": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "47647a0",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "47647a0",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "4764f34",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268597": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "47647b0",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "47647b0",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "4764f44",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268599": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "477783c",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "477783c",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "4777fd0",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268601": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4781660",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4781660",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "4781df4",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268602": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4785910",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4785910",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "47860a4",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268831": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "48f6fec",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "48f6fec",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "48f7780",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268849": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "488cec8",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268850": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "488cec8",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268851": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "488c734",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "488cec8",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "268880": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "48831a0",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [],
+        "generation": "build profile"
+      }
+    },
+    "269077": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "48a4fd8",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "48a4fd8",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "48a576c",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "269079": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "48a7ebc",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "48a7ebc",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "48a8650",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "269110": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "450a128",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "450a128",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "450a8bc",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "269111": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "450a144",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "450a144",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "450a8d8",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "269136": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "48a03b0",
+            "expected": [
+              "E00F0034"
+            ],
+            "asm": "7F000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "48a03b0",
+            "expected": [
+              "E00F0034",
+              "7F000014"
+            ],
+            "asm": "E00F0034"
+          },
+          {
+            "addr": "48a0b44",
+            "expected": [
+              "60B600F9"
+            ],
+            "asm": "7FB600F9"
+          }
+        ],
+        "generation": "4.1.10-11"
+      }
+    },
+    "269332": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "462f690",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "462f690",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "462fe30",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269333": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "463ef88",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "463ef88",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "463f728",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269334": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "461d894",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "461d894",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "461e034",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269338": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "462dc70",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "462dc70",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "462e410",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269340": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "462e470",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "462e470",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "462ec10",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269341": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "462e87c",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "462e87c",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "462f01c",
+            "expected": [
+              "60CE00F9"
+            ],
+            "asm": "7FCE00F9"
+          }
+        ],
+        "generation": "4.1.12"
+      }
+    },
+    "269574": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49056f8",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49056f8",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4905e98",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269575": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4905140",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4905140",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49058e0",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269576": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "490548c",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "490548c",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4905c2c",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269577": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4958a94",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4958a94",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4959234",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269578": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4958abc",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4958abc",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "495925c",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269579": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4958aa0",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4958aa0",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4959240",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269602": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "44de938",
+            "expected": [
+              "F44FBEA9FD7B01A9"
+            ],
+            "asm": "00008052C0035FD6"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "44de938",
+            "expected": [
+              "F44FBEA9FD7B01A9",
+              "00008052C0035FD6"
+            ],
+            "asm": "F44FBEA9FD7B01A9"
+          },
+          {
+            "addr": "4941e44",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49425e4",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "269602 special"
+      }
+    },
+    "269619": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "497fb78",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "497fb78",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4980318",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269624": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49adf38",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49adf38",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49ae6d8",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269626": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49ac5e8",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49ac5e8",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49acd88",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269627": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49abb4c",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49abb4c",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49ac2ec",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269628": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49af200",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49af200",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49af9a0",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "269631": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "49afa14",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "49afa14",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "49b01b4",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "270090": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4bbe83c",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4bbe83c",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4bbefdc",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "270100": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4bc4fa4",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4bc4fa4",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4bc5744",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "270102": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4bc53d8",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4bc53d8",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4bc5b78",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      },
+      "x86_64": {
+        "silent": [],
+        "keeptip": [
+          {
+            "addr": "537e8cd",
+            "expected": [
+              "E83E4BE9FF"
+            ],
+            "asm": "31C0909090"
+          }
+        ],
+        "generation": "build profile"
+      }
+    },
+    "270115": {
+      "arm64": {
+        "generation": "4.1.13+",
+        "silent": [
+          {
+            "addr": "4bbb1dc",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4bbb1dc",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4bbb97c",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ]
+      }
+    },
+    "270132": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4d16f58",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4d16f58",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4d176f8",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      }
+    },
+    "270134": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4d1caf0",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4d1caf0",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4d1d290",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      },
+      "x86_64": {
+        "silent": [],
+        "keeptip": [
+          {
+            "addr": "5502d5d",
+            "expected": [
+              "E8CE47E9FF"
+            ],
+            "asm": "31C0909090"
+          }
+        ],
+        "generation": "build profile"
+      }
+    },
+    "270135": {
+      "arm64": {
+        "silent": [
+          {
+            "addr": "4d1fb48",
+            "expected": [
+              "40100034"
+            ],
+            "asm": "82000014"
+          }
+        ],
+        "keeptip": [
+          {
+            "addr": "4d1fb48",
+            "expected": [
+              "40100034",
+              "82000014"
+            ],
+            "asm": "40100034"
+          },
+          {
+            "addr": "4d202e8",
+            "expected": [
+              "60E600F9"
+            ],
+            "asm": "7FE600F9"
+          }
+        ],
+        "generation": "4.1.13+"
+      },
+      "x86_64": {
+        "silent": [],
+        "keeptip": [
+          {
+            "addr": "5503f8d",
+            "expected": [
+              "E8CE47E9FF"
+            ],
+            "asm": "31C0909090"
+          }
+        ],
+        "generation": "build profile"
+      }
+    }
+  }
+}

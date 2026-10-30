@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -24,9 +26,9 @@ cp "$ROOT/app/Resources/Info.plist" "$APP/Contents/Info.plist"
 # packaged app is independent of SwiftPM's bundle layout).
 cp "$ROOT/app/Resources/MenuBarIcon.png" "$APP/Contents/Resources/MenuBarIcon.png"
 
-# Python engine (install / patch / locate)
+# Python engine (install / patch / locate) + build/profile table
 cp "$ROOT/tools/install.py" "$ROOT/tools/patch_copy.py" "$ROOT/tools/locate_revoke.py" \
-   "$APP/Contents/Resources/tools/"
+   "$ROOT/tools/revoke_profiles.json" "$APP/Contents/Resources/tools/"
 chmod 755 "$APP/Contents/Resources/tools/"*.py
 
 # Login-persistence dylib + user docs

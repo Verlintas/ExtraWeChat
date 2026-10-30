@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 Experimental login-persistence host for WeChat 4.x (macOS).
 

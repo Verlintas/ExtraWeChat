@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Verlintas
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import Foundation
 import SwiftUI
 
@@ -54,6 +57,8 @@ struct WeChatInfo: Equatable {
 
 struct LocateInfo: Decodable, Equatable {
     var generation: String?
+    var match: String?
+    var arch: String?
     var entry_va: UInt64?
     var silent_va: UInt64?
     var keeptip_va: UInt64?
@@ -85,6 +90,8 @@ struct InstallStatus: Decodable, Equatable {
     var has_backup: Bool?
     var running: Bool?
     var generation: String?
+    var match: String?
+    var arch: String?
     var silent_state: String?
     var keeptip_state: String?
     var patch_state: String?

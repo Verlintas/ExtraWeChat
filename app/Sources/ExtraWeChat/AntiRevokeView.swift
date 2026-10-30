@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Verlintas
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import SwiftUI
 
 struct AntiRevokeView: View {
@@ -12,6 +15,7 @@ struct AntiRevokeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 hero
+                if isUnsupported { unsupportedBanner }
                 if model.patchedCopyNeedsUpdate {
                     updateBanner
                 }
@@ -89,6 +93,12 @@ struct AntiRevokeView: View {
                         text: model.patchedCopyRunning ? "副本运行中" : model.patchedCopyExists ? "副本已就绪" : "未启用",
                         color: copyColor
                     )
+                    if let match = model.locate?.match {
+                        StatusPill(
+                            text: match == "profile" ? "版本已适配" : "自动定位",
+                            color: match == "profile" ? .blue : .orange
+                        )
+                    }
                     if model.patchedCopyExists && !isPatched {
                         StatusPill(text: "主微信未修改", color: .secondary)
                     }
@@ -124,6 +134,14 @@ struct AntiRevokeView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .strokeBorder(Color.accentColor.opacity(0.18))
+        )
+    }
+
+    private var unsupportedBanner: some View {
+        WarningBanner(
+            title: "当前微信构建暂未适配",
+            message: "构建号 \(model.info?.build ?? "未知") 不在内置适配表中，arm64 几何签名也未命中。请更新 ExtraWeChat，或在 GitHub Issues 提供构建号与 wechat.dylib 信息。",
+            color: .red
         )
     }
 
@@ -222,7 +240,7 @@ struct AntiRevokeView: View {
                           systemImage: "wand.and.stars")
                 }
                 .buttonStyle(.bordered)
-                .disabled(model.busy || model.info?.running == true || model.patchedCopyRunning)
+                .disabled(model.busy || model.info?.running == true || model.patchedCopyRunning || isUnsupported)
 
                 Button {
                     if model.patchedCopyRunning {
@@ -348,6 +366,7 @@ struct AntiRevokeView: View {
     }
 
     private var primaryLabel: String {
+        if isUnsupported { return "暂不支持此版本" }
         if model.patchedCopyRunning { return "打开微信副本" }
         if model.patchedCopyNeedsUpdate { return "更新并启动" }
         if !model.patchedCopyExists { return "创建防撤回副本" }
@@ -362,12 +381,13 @@ struct AntiRevokeView: View {
     }
 
     private var primaryDisabled: Bool {
-        if model.busy { return true }
+        if model.busy || isUnsupported { return true }
         if model.patchedCopyRunning { return false }
         return model.info?.running == true
     }
 
     private var primaryHint: String {
+        if isUnsupported { return "等待适配表更新" }
         if model.patchedCopyRunning {
             return model.patchedCopyNeedsUpdate ? "先退出副本再更新" : "副本正在运行"
         }
@@ -386,7 +406,12 @@ struct AntiRevokeView: View {
         model.status?.patch_state == "silent" || model.status?.patch_state == "keeptip"
     }
 
+    private var isUnsupported: Bool {
+        model.status?.patch_state == "unsupported"
+    }
+
     private var heroTitle: String {
+        if isUnsupported { return "当前微信版本未适配" }
         if model.patchedCopyNeedsUpdate { return "副本需要更新" }
         if model.patchedCopyRunning { return "防撤回正在保护" }
         if model.patchedCopyExists { return "防撤回已就绪" }
@@ -394,6 +419,9 @@ struct AntiRevokeView: View {
     }
 
     private var heroSubtitle: String {
+        if isUnsupported {
+            return "已识别构建号 \(model.info?.build ?? "未知")，但补丁点不在适配表中。请更新 ExtraWeChat 后再试。"
+        }
         if model.patchedCopyNeedsUpdate {
             return "微信已更新，副本还是旧版本。重建后继续使用，聊天记录不会丢失。"
         }
@@ -408,6 +436,7 @@ struct AntiRevokeView: View {
     }
 
     private var heroIcon: String {
+        if isUnsupported { return "exclamationmark.shield.fill" }
         if model.patchedCopyNeedsUpdate { return "arrow.triangle.2.circlepath" }
         if model.patchedCopyRunning { return "checkmark.shield.fill" }
         if model.patchedCopyExists { return "shield.lefthalf.filled" }
@@ -415,6 +444,7 @@ struct AntiRevokeView: View {
     }
 
     private var heroColors: [Color] {
+        if isUnsupported { return [.orange, .red] }
         if model.patchedCopyRunning {
             return [.green, .teal]
         }

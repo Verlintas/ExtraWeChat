@@ -369,3 +369,35 @@ AXApplication 微信
 - 深色 / 浅色外观均实际检查，文字与卡片对比度正常。
 
 截图见 `docs/screenshots/overview.png`、`anti-revoke.png`、`diagnostics.png`。
+
+---
+
+## 13. v0.1.4：扩大微信版本适配（2026-10-30）
+
+### 13.1 适配表
+
+- 新增 `tools/revoke_profiles.json`，按 `CFBundleVersion` 保存 42 个微信 4.x
+  arm64 构建的 silent / keeptip 补丁点；
+- 覆盖 4.1.10 ~ 4.1.15.55（268575–270135）；
+- 268880 仅支持 silent；269602 使用分类函数桩 + parseRevokeXML 的特殊配置；
+- 未收录的构建仍可用 3 代 arm64 几何签名自动定位。
+
+### 13.2 验证
+
+- 270115 上 `match=profile` 与 `--force-scan` 的 `match=signature` 地址完全一致；
+- 在独立 `wechat.dylib` 副本上完成 pristine → silent → keeptip → pristine 字节级测试；
+- `python3 -m unittest discover -s tests` 共 8 项通过；
+- GUI / 安装脚本改为读取 `entries`，同时保留旧字节校验；
+- 未适配构建会在 GUI 显示「当前微信构建暂未适配」，不会写入。
+
+### 13.3 平台范围
+
+- 仅 Apple Silicon（arm64）；
+- App 目标 macOS 13+，本机 macOS 27.0.1 实测；
+- Intel、微信 3.8.x、4.1.7 不支持。
+
+### 13.4 未验证
+
+- 42 个构建中只有 270115 做了真实撤回测试；
+- 其余构建的地址来自 zengtianli/WeChatTweak 的公开配置（AGPL-3.0），
+  已做格式和原始字节校验，但未逐一在真机启动验证。

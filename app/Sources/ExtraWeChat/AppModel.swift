@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Verlintas
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import AppKit
 import Combine
 import Foundation
@@ -165,10 +168,12 @@ final class AppModel: ObservableObject {
         info?.running = running
 
         do {
+            status = nil
             if let output = try? await runPython("install.py", ["status", "--app", wechatPath, "--json"]),
                let data = output.data(using: .utf8) {
                 status = try? JSONDecoder().decode(InstallStatus.self, from: data)
             }
+            locate = nil
             if let output = try? await runPython("locate_revoke.py", ["--app", wechatPath, "--json"]),
                let data = output.data(using: .utf8) {
                 locate = try? JSONDecoder().decode(LocateInfo.self, from: data)

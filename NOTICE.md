@@ -1,6 +1,19 @@
 # NOTICE / 第三方致谢
 
-本项目（ExtraWeChat）的代码以 AGPL-3.0 发布。以下项目提供了 4.x 补丁点、几何签名或重签思路的
+本项目（ExtraWeChat）的代码以 **AGPL-3.0-only** 发布。
+Copyright (C) 2026 Verlintas and ExtraWeChat contributors.
+
+所有项目源文件均带有 SPDX 版权与许可标识：
+
+```text
+SPDX-FileCopyrightText: 2026 Verlintas
+SPDX-License-Identifier: AGPL-3.0-only
+```
+
+`tools/revoke_profiles.json` 中的构建地址数据来自 zengtianli/WeChatTweak 的公开
+AGPL-3.0 配置，详见下方致谢。第三方文件保留其原始版权头。
+
+以下项目提供了 4.x 补丁点、几何签名或重签思路的
 公开资料，在此致谢：
 
 ## fzlzjerry/wechat-antirecall
@@ -22,6 +35,12 @@
 
 - 被重新实现的目标项目；提供旧版功能清单、交互和自动回复/远程控制的产品定义。
 - 本项目不包含该项目的代码；仅在其功能目标上做新版可行性评估。
+
+## fishhook (BSD-2-Clause)
+
+- `tools/login_persist/vendor/fishhook.c` / `fishhook.h`
+- Copyright (c) 2013, Facebook, Inc.；保留原始版权头和 BSD 许可文本。
+- 仅用于登录态保持实验 dylib 的符号重绑定。
 
 ## Tencent WeChat
 

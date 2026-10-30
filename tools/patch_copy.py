@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 patch_copy.py — experimental proof-of-concept: patch and ad-hoc re-sign a COPY
 of WeChat.app. It never writes to the source app.
@@ -113,23 +115,29 @@ def copy_app(src: str, dst: str, force: bool) -> None:
         raise Error(f"ditto failed:\n{r.stderr}")
 
 
-def locate_in_dylib(dylib: str) -> dict:
+def locate_in_dylib(dylib: str, build: str | None = None) -> dict:
     with open(dylib, "rb") as f:
         data = f.read()
-    sl, slice_off = L.arm64_slice(data)
+    sl, slice_off, arch = L.macho_slice(data, "auto")
     segments, sections = L.parse_macho(sl)
-    result = L.locate(sl, segments, sections)
+    result = L.locate_with_profile(sl, segments, sections, build, arch)
     result["slice_offset"] = slice_off
+    result["arch"] = arch
     return result
 
 
-def patch_entries(dylib: str, entries: list[tuple[int, list[bytes], bytes]], label: str) -> None:
-    """entries: (arm64 VA, accepted original bytes, replacement bytes)."""
+def patch_entries(dylib: str, entries: list[dict], label: str) -> None:
+    """entries: [{"va": int, "expected": [hex, ...], "patch": hex}]."""
     with open(dylib, "r+b") as f:
         data = f.read()
-        sl, slice_off = L.arm64_slice(data)
+        sl, slice_off, arch = L.macho_slice(data, "auto")
+        if arch != "arm64":
+            raise Error(f"{label}: unsupported target architecture {arch}")
         segments, _sections = L.parse_macho(sl)
-        for va, accepted, replacement in entries:
+        for entry in entries:
+            va = int(entry["va"])
+            replacement = bytes.fromhex(entry["patch"])
+            accepted = [bytes.fromhex(x) for x in entry["expected"]]
             off = L.va_to_off(segments, va)
             if off is None:
                 raise Error(f"{label}: VA 0x{va:x} is not file-backed")
@@ -141,7 +149,7 @@ def patch_entries(dylib: str, entries: list[tuple[int, list[bytes], bytes]], lab
                 continue
             if original not in accepted:
                 raise Error(
-                    f"[{label}] unexpected bytes at VA 0x{va:x}: "
+                    f"{label}: unexpected bytes at VA 0x{va:x}: "
                     f"{original.hex().upper()} (want one of "
                     f"{' / '.join(x.hex().upper() for x in accepted)}) — wrong build? refusing to write"
                 )
@@ -157,25 +165,10 @@ def patch_anti_revoke(dylib: str, located: dict, variant: str) -> None:
     if variant == "none":
         print("[patch] anti-revoke disabled (--variant none)")
         return
-    silent_va = located["silent_va"]
-    keeptip_va = located["keeptip_va"]
-    cbz = bytes.fromhex(located["silent_pristine"])
-    branch = bytes.fromhex(located["silent_patch"])
-    str_x0 = bytes.fromhex(located["keeptip_pristine"])
-    str_xzr = bytes.fromhex(located["keeptip_patch"])
-    if variant == "silent":
-        patch_entries(dylib, [(silent_va, [cbz, branch], branch)], "silent")
-    elif variant == "keeptip":
-        patch_entries(
-            dylib,
-            [
-                (silent_va, [cbz, branch], cbz),
-                (keeptip_va, [str_x0], str_xzr),
-            ],
-            "keeptip",
-        )
-    else:
-        raise Error(f"unknown variant: {variant}")
+    entries = located.get("entries", {}).get(variant, [])
+    if not entries:
+        raise Error(f"no {variant} patch entries for this WeChat build")
+    patch_entries(dylib, entries, variant)
 
 
 def set_plist_values(path: str, values: dict) -> None:
@@ -337,7 +330,7 @@ def main() -> None:
     dylib = os.path.join(dst, "Contents", "Resources", "wechat.dylib")
     located = None
     if args.variant != "none":
-        located = locate_in_dylib(dylib)
+        located = locate_in_dylib(dylib, build=info.get("build"))
         print(f"[locate] {located['generation']}, E=0x{located['entry_va']:x}, "
               f"silent=0x{located['silent_va']:x}, keeptip=0x{located['keeptip_va']:x}")
 

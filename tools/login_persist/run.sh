@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2026 Verlintas
+# SPDX-License-Identifier: AGPL-3.0-only
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 APP="${1:-/Applications/WeChat.app}"
