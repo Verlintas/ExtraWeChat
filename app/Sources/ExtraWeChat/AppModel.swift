@@ -849,6 +849,61 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func checkProfileUpdates() async {
+        busy = true
+        log = ""
+        errorMessage = nil
+        defer { busy = false }
+        do {
+            let output = try await runPython("profile_update.py", ["update", "--json"])
+            log = output
+            if let data = output.data(using: .utf8),
+               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                let status = object["status"] as? String ?? "unknown"
+                let builds = object["remote_builds"] as? Int ?? 0
+                if status == "installed" || status == "up-to-date" {
+                    toast = status == "installed"
+                        ? "适配表已更新（\(builds) 个构建）"
+                        : "适配表已是最新"
+                } else {
+                    toast = "适配表状态：\(status)"
+                }
+            }
+            await refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+            log = error.localizedDescription
+        }
+    }
+
+    func switchCopyMode(variant: String) async {
+        guard patchedCopyExists else {
+            errorMessage = "还没有补丁副本。"
+            return
+        }
+        if isRunning(appPath: patchedCopyPath.path) {
+            errorMessage = "补丁副本正在运行。请先退出副本，再切换模式。"
+            return
+        }
+        if isRunning(appPath: wechatPath) {
+            errorMessage = "原微信仍在运行。请先完全退出原微信。"
+            return
+        }
+        await perform("正在切换补丁模式…") {
+            try await self.runPython("switch_mode.py", [
+                "--app", self.patchedCopyPath.path,
+                "--variant", variant,
+            ])
+        }
+        if errorMessage == nil {
+            let marker: [String: Any] = ["variant": variant, "path": patchedCopyPath.path]
+            if let data = try? JSONSerialization.data(withJSONObject: marker) {
+                try? data.write(to: patchedCopyMarker, options: .atomic)
+            }
+            launchPatchedCopy()
+        }
+    }
+
     func openProfilesFile() {
         guard let url = profilesPath else {
             errorMessage = "找不到 revoke_profiles.json"

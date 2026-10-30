@@ -40,9 +40,11 @@ import struct
 import subprocess
 import sys
 
-PROFILES_PATH = os.environ.get(
-    "EXTRAWECHAT_PROFILES",
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "revoke_profiles.json"),
+BUNDLED_PROFILES_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "revoke_profiles.json"
+)
+LOCAL_PROFILES_PATH = os.path.expanduser(
+    "~/Library/Application Support/ExtraWeChat/profiles/revoke_profiles.json"
 )
 
 FAT_MAGIC = 0xCAFEBABE
@@ -54,17 +56,46 @@ CPU_TYPE_ARM64 = 0x0100000C
 STR_RT_MASK = 0xFFFFFFE0
 
 
-def _load_profiles() -> dict:
-    if not os.path.exists(PROFILES_PATH):
-        raise SystemExit(
-            f"missing signature/profile table: {PROFILES_PATH}\n"
-            "Expected tools/revoke_profiles.json in the app bundle."
-        )
-    with open(PROFILES_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+def _read_profile(path: str) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        doc = json.load(f)
+    if not isinstance(doc.get("builds"), dict) or not doc["builds"]:
+        raise ValueError("missing builds table")
+    return doc
 
 
-PROFILES = _load_profiles()
+def _load_profiles() -> tuple[dict, str, str]:
+    override = os.environ.get("EXTRAWECHAT_PROFILES")
+    if override:
+        try:
+            return _read_profile(override), override, "override"
+        except Exception as error:
+            raise SystemExit(f"invalid profile override {override}: {error}")
+
+    local = None
+    bundled = None
+    try:
+        local = _read_profile(LOCAL_PROFILES_PATH)
+    except Exception:
+        pass
+    try:
+        bundled = _read_profile(BUNDLED_PROFILES_PATH)
+    except Exception as error:
+        if local is None:
+            raise SystemExit(
+                "missing or invalid signature/profile table: "
+                f"{BUNDLED_PROFILES_PATH}: {error}"
+            )
+
+    # Avoid a stale local override hiding newer bundled profiles. Equal build
+    # counts still prefer local, so address corrections can be delivered.
+    if local is not None:
+        if bundled is None or len(local["builds"]) >= len(bundled["builds"]):
+            return local, LOCAL_PROFILES_PATH, "local"
+    return bundled, BUNDLED_PROFILES_PATH, "bundled"
+
+
+PROFILES, PROFILES_PATH, PROFILES_SOURCE = _load_profiles()
 OFF_CBZ = int(PROFILES.get("off_cbz", "0x270"), 16)
 
 SIGNATURES: list[dict] = []
@@ -556,6 +587,8 @@ def main() -> None:
         "slice_offset": slice_off,
         "host_arch": platform.machine(),
         "build": build,
+        "profiles_path": PROFILES_PATH,
+        "profiles_source": PROFILES_SOURCE,
         "codesign": codesign_flags(app) if not args.dylib else None,
         **info,
     })

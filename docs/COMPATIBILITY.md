@@ -51,6 +51,18 @@ silent / keeptip 补丁点和原始字节。写入前会逐字节校验，构建
 如果构建重编译了 `parseRevokeXML`，几何签名全部不中，GUI 会显示
 「当前微信构建暂未适配」，不会写入任何字节。
 
+## 远程适配表
+
+`tools/revoke_profiles.json` 会随 App 打包，但也可以在运行时更新：
+
+```bash
+python3 tools/profile_update.py update --json
+```
+
+文件下载到 `~/Library/Application Support/ExtraWeChat/profiles/`，并校验 SHA。
+本地表优先；如果本地表构建数少于内置表，自动回退内置表。
+微信更新后不必等新版 ExtraWeChat，只要远端表已经收录新构建号。
+
 ## 新增一个微信构建
 
 1. 在目标微信上运行只读定位：

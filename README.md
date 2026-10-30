@@ -32,13 +32,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.7-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.7-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.1.8-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.8-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.7-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.8-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -55,8 +55,8 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.7-arm64.zip
-#   build/ExtraWeChat-0.1.7-arm64.pkg
+#   build/ExtraWeChat-0.1.8-arm64.zip
+#   build/ExtraWeChat-0.1.8-arm64.pkg
 ```
 
 要求：**Apple Silicon（arm64）**、macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
@@ -66,11 +66,11 @@ open ExtraWeChat.app
 | 页面 | 功能 |
 | --- | --- |
 | 概览 | 微信版本/构建/渠道、运行状态、防撤回/多开/登录态状态 |
-| 消息防撤回 | silent / keeptip、补丁副本创建/启动、安装到主微信、还原 |
+| 消息防撤回 | silent / keeptip、补丁副本创建/启动、秒级切换模式、安装到主微信、还原 |
 | 增强 | 窗口隐私（录屏/共享时隐藏微信窗口）；自定义提示/撤回记录/关键词提醒规划中 |
 | 外观 | 微信绿 / 深海蓝 / 日落橙 / 紫罗兰 / 石墨灰 |
 | 设置 | 工具栏齿轮、侧栏「设置」、应用菜单；含主题、微信路径、运行时信息 |
-| 开发者 | 环境、微信扫描、兼容性检查、原始 JSON、签名验证和诊断导出 |
+| 开发者 | 环境、微信扫描、兼容性检查、原始 JSON、签名验证、适配表远程更新和诊断导出 |
 | 多开实例 | 新建/启动/带登录态启动/删除独立实例 |
 | 登录态保持 | 启用 allow-dyld-env、带 dylib 启动、查看 key 状态、清除 key、日志 |
 | 诊断 | Python/tools/dylib 路径、补丁地址、备份状态、复制诊断 |
@@ -171,6 +171,8 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 | 功能 | 状态 |
 | --- | --- |
 | 防撤回（silent / keeptip） | ✅ 42 个 4.x arm64 构建内置适配 + 3 代自动定位；270115 实测撤回 |
+| 适配表远程更新 | ✅ 从 main 分支拉取并校验 SHA，无需等新版 App |
+| 秒级切换模式 | ✅ 原地改写副本 dylib + 重签，约 1 秒 |
 | 多开（独立数据目录） | ✅ 副本启动验证通过；GUI 已封装 |
 | 备份 / 还原 / 诊断 | ✅ 已实现 |
 | 菜单栏 / GUI / 主题 | ✅ 已实现（ad-hoc 签名，未公证） |

@@ -473,3 +473,36 @@ AXApplication 微信
 - 独立 dylib 上 silent → keeptip 切换通过；
 - 开发者页实际启动并截图检查；
 - App / pkg 签名验证通过。
+
+---
+
+## 17. v0.1.8：远程适配表与秒级切换（2026-10-30）
+
+### 17.1 远程适配表
+
+- 新增 `tools/profile_update.py`；
+- 从 GitHub main 拉取 `revoke_profiles.json` 和 `.sha256`；
+- 校验 SHA、构建表结构后写入
+  `~/Library/Application Support/ExtraWeChat/profiles/revoke_profiles.json`；
+- 定位器优先本地表；本地表构建数少于内置表时自动回退；
+- `reset` 可删除本地覆盖；
+- 测试覆盖校验器、SHA 文件和同文件 check。
+
+### 17.2 秒级切换模式
+
+- 新增 `tools/switch_mode.py`；
+- 只改写副本 `wechat.dylib` 的补丁字节，重签 dylib + App 根；
+- 实测 silent → keeptip 约 1.1 秒，keeptip → silent 约 1.2 秒；
+- 失败时用旧字节回滚并重签；
+- 验证 locator 状态和 `codesign --deep --strict`。
+
+### 17.3 测试
+
+- `python3 -m unittest discover -s tests` 共 15 项通过；
+- 构建表、远程配置、SHA、边缘情况和签名几何均覆盖。
+
+### 17.4 待验证
+
+- 远程 GitHub URL 在发布后实际拉取；
+- GUI「检查适配更新」按钮的真实网络路径；
+- GUI「切换模式」菜单在副本退出后的实际点击。

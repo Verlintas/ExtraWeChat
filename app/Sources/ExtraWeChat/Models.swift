@@ -66,6 +66,8 @@ struct LocateInfo: Decodable, Equatable {
     var generation: String?
     var match: String?
     var arch: String?
+    var profiles_path: String?
+    var profiles_source: String?
     var entry_va: UInt64?
     var silent_va: UInt64?
     var keeptip_va: UInt64?

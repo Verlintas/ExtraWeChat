@@ -52,6 +52,7 @@ struct DeveloperView: View {
             KeyValueRow(key: "tools", value: model.toolsDir?.path ?? "未找到")
             KeyValueRow(key: "runtime dylib", value: model.bundledRuntimeDylibURL?.path ?? "未找到")
             KeyValueRow(key: "profiles", value: model.profilesPath?.path ?? "未找到")
+            KeyValueRow(key: "配置来源", value: model.locate?.profiles_source == "local" ? "本地更新" : "内置")
             KeyValueRow(key: "数据目录", value: model.dataDir.path)
         }
     }
@@ -150,6 +151,12 @@ struct DeveloperView: View {
                     Task { await model.refresh() }
                 } label: {
                     Label("重新扫描", systemImage: "arrow.clockwise")
+                }
+                .disabled(model.busy)
+                Button {
+                    Task { await model.checkProfileUpdates() }
+                } label: {
+                    Label("检查适配更新", systemImage: "arrow.down.circle")
                 }
                 .disabled(model.busy)
                 Button {

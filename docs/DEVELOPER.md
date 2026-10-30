@@ -55,6 +55,34 @@
 4. 增加 `tests/test_profiles.py` 的覆盖；
 5. 在补丁副本上做真实撤回测试，再发布。
 
+## 远程适配表
+
+`tools/profile_update.py` 可以拉取 main 分支的 `revoke_profiles.json`，校验 SHA 后保存到：
+
+```text
+~/Library/Application Support/ExtraWeChat/profiles/revoke_profiles.json
+```
+
+定位器优先使用本地表；如果本地表构建数少于内置表，会自动回退内置表，避免旧配置遮住新版本。
+开发者页 →「检查适配更新」会执行同样的流程。
+
+```bash
+python3 tools/profile_update.py check --json
+python3 tools/profile_update.py update --json
+python3 tools/profile_update.py reset --json
+```
+
+## 快速切换模式
+
+`tools/switch_mode.py` 只改写副本的 `wechat.dylib` 并重签 dylib + App 根签名，不重建副本：
+
+```bash
+python3 tools/switch_mode.py --app ~/Applications/WeChatExtra.app --variant silent
+python3 tools/switch_mode.py --app ~/Applications/WeChatExtra.app --variant keeptip
+```
+
+实测约 1 秒。副本必须完全退出；失败会尝试回滚旧字节并重新签名。
+
 ## 测试
 
 ```bash
@@ -63,4 +91,5 @@ python3 tools/locate_revoke.py --app /Applications/WeChat.app
 python3 tools/locate_revoke.py --app /Applications/WeChat.app --force-scan
 ```
 
-当前测试覆盖构建表格式、expected/asm 长度、地址重叠、268880、269602 和 3 代签名几何。
+当前测试覆盖构建表格式、expected/asm 长度、地址重叠、268880、269602、3 代签名几何、
+远程配置校验和 SHA 文件，共 15 项。

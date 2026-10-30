@@ -242,6 +242,21 @@ struct AntiRevokeView: View {
                 .buttonStyle(.bordered)
                 .disabled(model.busy || model.info?.running == true || model.patchedCopyRunning || isUnsupported)
 
+                Menu {
+                    Button("静默模式（silent）") {
+                        Task { await model.switchCopyMode(variant: "silent") }
+                    }
+                    Button("提示模式（keeptip）") {
+                        Task { await model.switchCopyMode(variant: "keeptip") }
+                    }
+                } label: {
+                    Label("切换模式", systemImage: "arrow.left.arrow.right")
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help("切换 silent / keeptip")
+                .disabled(!model.patchedCopyExists || model.patchedCopyRunning || model.info?.running == true || isUnsupported)
+
                 Button {
                     if model.patchedCopyRunning {
                         model.activatePatchedCopy()
