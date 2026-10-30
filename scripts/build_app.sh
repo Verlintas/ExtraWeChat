@@ -10,6 +10,9 @@ VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$ROOT
 echo "==> build login dylib"
 ARCH="${ARCH:-arm64}" "$ROOT/tools/login_persist/build.sh"
 
+echo "==> build runtime dylib"
+ARCH="${ARCH:-arm64}" "$ROOT/tools/runtime/build.sh"
+
 echo "==> build Swift app"
 swift build -c release --package-path "$ROOT/app"
 BIN="$(swift build -c release --package-path "$ROOT/app" --show-bin-path)/ExtraWeChat"
@@ -34,6 +37,8 @@ chmod 755 "$APP/Contents/Resources/tools/"*.py
 # Login-persistence dylib + user docs
 cp "$ROOT/tools/login_persist/build/libExtraWeChatLogin.dylib" \
    "$APP/Contents/Resources/libExtraWeChatLogin.dylib"
+cp "$ROOT/tools/runtime/build/libExtraWeChatRuntime.dylib" \
+   "$APP/Contents/Resources/libExtraWeChatRuntime.dylib"
 cp "$ROOT/tools/login_persist/README.md" \
    "$APP/Contents/Resources/LOGIN-PERSISTENCE.md"
 cp "$ROOT/LICENSE" "$ROOT/NOTICE.md" "$ROOT/README.md" "$APP/Contents/Resources/"

@@ -58,6 +58,14 @@ struct MenuBarView: View {
                 Label("消息防撤回设置…", systemImage: "shield.lefthalf.filled")
             }
 
+            Button {
+                openWindow(id: "main")
+                NSApp.activate(ignoringOtherApps: true)
+                model.section = .enhancements
+            } label: {
+                Label("窗口隐私 / 增强…", systemImage: "eye.slash")
+            }
+
             Divider()
 
             Button {

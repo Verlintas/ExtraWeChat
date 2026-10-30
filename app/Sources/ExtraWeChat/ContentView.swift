@@ -5,34 +5,33 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         NavigationSplitView {
-            List(AppSection.allCases, selection: $model.section) { section in
-                Label(section.title, systemImage: section.icon)
-                    .tag(section)
-            }
-            .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 280)
-            .safeAreaInset(edge: .bottom) {
-                HStack(spacing: 8) {
-                    BrandAssets.appIcon
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 24, height: 24)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("ExtraWeChat \(appVersion)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Text("微信 4.x 实验工具")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(AppSection.allCases) { section in
+                    sidebarRow(section)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
+                Spacer(minLength: 12)
+                sidebarFooter
             }
+            .padding(12)
+            .background {
+                ZStack {
+                    LinearGradient(
+                        colors: colorScheme == .dark ? model.theme.darkBase : model.theme.lightBase,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    model.theme.accent.opacity(colorScheme == .dark ? 0.10 : 0.06)
+                }
+                .ignoresSafeArea()
+            }
+            .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 280)
         } detail: {
             detail
+                .background(ThemeBackground(theme: model.theme))
                 .navigationTitle(model.section.title)
                 .toolbar {
                     ToolbarItemGroup(placement: .primaryAction) {
@@ -50,6 +49,8 @@ struct ContentView: View {
                     }
                 }
         }
+        .environment(\.appTheme, model.theme)
+        .tint(model.theme.accent)
         .overlay(alignment: .bottom) {
             if let toast = model.toast {
                 Text(toast)
@@ -96,6 +97,57 @@ struct ContentView: View {
         }
     }
 
+    private func sidebarRow(_ section: AppSection) -> some View {
+        let selected = model.section == section
+        return Button {
+            model.section = section
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: section.icon)
+                    .frame(width: 18)
+                Text(section.title)
+                Spacer(minLength: 0)
+            }
+            .font(.system(size: 13, weight: selected ? .semibold : .regular))
+            .foregroundStyle(selected ? Color.primary : Color.secondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(
+                selected ? model.theme.accent.opacity(0.22) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(selected ? model.theme.accent.opacity(0.35) : Color.clear)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var sidebarFooter: some View {
+        HStack(spacing: 8) {
+            BrandAssets.appIcon
+                .resizable()
+                .interpolation(.high)
+                .frame(width: 24, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("ExtraWeChat \(appVersion)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text("微信 4.x 实验工具")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer()
+            Circle()
+                .fill(model.theme.accent)
+                .frame(width: 8, height: 8)
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 8)
+    }
+
     @ViewBuilder
     private var detail: some View {
         switch model.section {
@@ -103,6 +155,8 @@ struct ContentView: View {
             OverviewView()
         case .antiRevoke:
             AntiRevokeView()
+        case .enhancements:
+            EnhancementsView()
         case .instances:
             InstancesView()
         case .loginPersistence:

@@ -7,6 +7,7 @@ import SwiftUI
 enum AppSection: String, CaseIterable, Identifiable {
     case overview
     case antiRevoke
+    case enhancements
     case instances
     case loginPersistence
     case diagnostics
@@ -17,6 +18,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .overview: return "概览"
         case .antiRevoke: return "消息防撤回"
+        case .enhancements: return "增强"
         case .instances: return "多开实例"
         case .loginPersistence: return "登录态保持"
         case .diagnostics: return "诊断"
@@ -27,6 +29,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .overview: return "gauge.with.dots.needle.67percent"
         case .antiRevoke: return "arrow.uturn.backward.circle"
+        case .enhancements: return "wand.and.stars"
         case .instances: return "square.on.square"
         case .loginPersistence: return "key.horizontal"
         case .diagnostics: return "stethoscope"

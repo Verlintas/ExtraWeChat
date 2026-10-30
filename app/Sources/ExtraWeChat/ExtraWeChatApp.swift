@@ -18,6 +18,15 @@ struct ExtraWeChatApp: App {
         .defaultSize(width: 1040, height: 720)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandMenu("视图") {
+                ForEach(Array(AppSection.allCases.enumerated()), id: \.element) { index, section in
+                    Button(section.title) {
+                        model.section = section
+                    }
+                    .keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: [.command])
+                }
+            }
+
             CommandMenu("ExtraWeChat") {
                 Button("刷新状态") {
                     Task { await model.refresh() }
@@ -42,7 +51,7 @@ struct ExtraWeChatApp: App {
         Settings {
             SettingsView()
                 .environmentObject(model)
-                .frame(width: 560, height: 320)
+                .frame(width: 640, height: 560)
         }
     }
 }

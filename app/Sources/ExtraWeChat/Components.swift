@@ -5,6 +5,7 @@ import AppKit
 import SwiftUI
 
 struct Card<Content: View>: View {
+    @Environment(\.appTheme) private var theme
     let title: String
     let icon: String
     @ViewBuilder var content: Content
@@ -23,10 +24,15 @@ struct Card<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.regularMaterial)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(theme.accent.opacity(0.06))
+        }
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.06))
+                .strokeBorder(theme.accent.opacity(0.10))
         )
     }
 }

@@ -20,6 +20,13 @@ final class AppModel: ObservableObject {
     @Published var patchedCopyVersion: String?
     @Published var patchedCopyBuild: String?
     @Published var patchedCopyPatchState: String?
+    @Published var patchedCopySupportsDYLD = false
+    @Published var windowPrivacy: Bool {
+        didSet { UserDefaults.standard.set(windowPrivacy, forKey: "windowPrivacy") }
+    }
+    @Published var theme: AppTheme {
+        didSet { UserDefaults.standard.set(theme.rawValue, forKey: "appTheme") }
+    }
     @Published var busy = false
     @Published var refreshing = false
     @Published var log = ""
@@ -44,6 +51,8 @@ final class AppModel: ObservableObject {
         instancesDir = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Applications/ExtraWeChat/Instances", isDirectory: true)
         backupDir = dataDir.appendingPathComponent("backups", isDirectory: true)
+        windowPrivacy = UserDefaults.standard.bool(forKey: "windowPrivacy")
+        theme = AppTheme(rawValue: UserDefaults.standard.string(forKey: "appTheme") ?? "") ?? .wechat
         try? FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: instancesDir, withIntermediateDirectories: true)
     }
@@ -135,6 +144,23 @@ final class AppModel: ObservableObject {
         }
     }
 
+    var bundledRuntimeDylibURL: URL? {
+        let fm = FileManager.default
+        if let res = Bundle.main.resourceURL?.appendingPathComponent("libExtraWeChatRuntime.dylib"),
+           fm.fileExists(atPath: res.path) {
+            return res
+        }
+        if let tools = toolsDir {
+            let candidate = tools.appendingPathComponent("runtime/build/libExtraWeChatRuntime.dylib")
+            if fm.fileExists(atPath: candidate.path) { return candidate.standardizedFileURL }
+        }
+        return nil
+    }
+
+    var windowPrivacySupported: Bool {
+        patchedCopyExists && patchedCopySupportsDYLD
+    }
+
     var mainKeyPath: URL {
         let container = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/ExtraWeChat/login_keys.tsv")
@@ -189,6 +215,7 @@ final class AppModel: ObservableObject {
             patchedCopyVersion = copyInfo?.displayVersion
             patchedCopyBuild = copyInfo?.build
             patchedCopyRunning = isRunning(appPath: copy.path)
+            patchedCopySupportsDYLD = hasDYLDEntitlement(copy.path)
             patchedCopyPatchState = nil
             if let data = try? Data(contentsOf: patchedCopyMarker),
                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
@@ -198,6 +225,7 @@ final class AppModel: ObservableObject {
             patchedCopyVersion = nil
             patchedCopyBuild = nil
             patchedCopyRunning = false
+            patchedCopySupportsDYLD = false
             patchedCopyPatchState = nil
         }
 
@@ -499,17 +527,37 @@ final class AppModel: ObservableObject {
             activatePatchedCopy()
             return
         }
+        var args = ["-n"]
+        if windowPrivacy {
+            guard let runtime = bundledRuntimeDylibURL else {
+                errorMessage = "找不到窗口隐私组件。请重新构建/安装 ExtraWeChat。"
+                return
+            }
+            guard hasDYLDEntitlement(copy.path) else {
+                errorMessage = "补丁副本没有启用 DYLD。请先「更新副本」再开启窗口隐私。"
+                return
+            }
+            args += ["--env", "DYLD_INSERT_LIBRARIES=\(runtime.path)"]
+            args += ["--env", "EXTRAWECHAT_WINDOW_PRIVACY=1"]
+        }
+        args.append(copy.path)
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-        process.arguments = ["-n", copy.path]
+        process.arguments = args
         do {
             try process.run()
             patchedCopyExists = true
             patchedCopyRunning = true
-            toast = "已启动补丁副本"
+            toast = windowPrivacy ? "已启动补丁副本（窗口隐私）" : "已启动补丁副本"
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func restartPatchedCopy() async {
+        await quitPatchedCopy()
+        launchPatchedCopy()
     }
 
     func activatePatchedCopy() {

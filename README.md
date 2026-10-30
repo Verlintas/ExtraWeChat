@@ -25,13 +25,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.4-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.4-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.1.5-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.1.5-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.4-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.5-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -48,8 +48,8 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.4-arm64.zip
-#   build/ExtraWeChat-0.1.4-arm64.pkg
+#   build/ExtraWeChat-0.1.5-arm64.zip
+#   build/ExtraWeChat-0.1.5-arm64.pkg
 ```
 
 要求：**Apple Silicon（arm64）**、macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
@@ -60,6 +60,8 @@ open ExtraWeChat.app
 | --- | --- |
 | 概览 | 微信版本/构建/渠道、运行状态、防撤回/多开/登录态状态 |
 | 消息防撤回 | silent / keeptip、补丁副本创建/启动、安装到主微信、还原 |
+| 增强 | 窗口隐私（录屏/共享时隐藏微信窗口）；自定义提示/撤回记录/关键词提醒规划中 |
+| 外观 | 微信绿 / 深海蓝 / 日落橙 / 紫罗兰 / 石墨灰 |
 | 多开实例 | 新建/启动/带登录态启动/删除独立实例 |
 | 登录态保持 | 启用 allow-dyld-env、带 dylib 启动、查看 key 状态、清除 key、日志 |
 | 诊断 | Python/tools/dylib 路径、补丁地址、备份状态、复制诊断 |
@@ -162,7 +164,8 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 | 防撤回（silent / keeptip） | ✅ 42 个 4.x arm64 构建内置适配 + 3 代自动定位；270115 实测撤回 |
 | 多开（独立数据目录） | ✅ 副本启动验证通过；GUI 已封装 |
 | 备份 / 还原 / 诊断 | ✅ 已实现 |
-| 菜单栏 / GUI | ✅ 已实现（ad-hoc 签名，未公证） |
+| 菜单栏 / GUI / 主题 | ✅ 已实现（ad-hoc 签名，未公证） |
+| 窗口隐私（增强） | ✅ runtime dylib 已实现；主窗口/聊天窗口实测 sharing=0 |
 | 登录态保持 | ⚠️ 核心层 dylib 原型，hook 已验证；真实 key 捕获待账号验收 |
 | 阻止自动更新 | ⚠️ App Store 版不适用；官网版后续实现 |
 | 自动回复 / 远程控制 | ❌ AX 读不到聊天内容；OCR 仅实验 |
@@ -182,6 +185,7 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 
 - [可行性报告](docs/FEASIBILITY.md)
 - [微信 / macOS 兼容性](docs/COMPATIBILITY.md)
+- [增强功能与运行时组件](docs/ENHANCEMENTS.md)
 - [270115 补丁点](docs/PATCH-270115.md)
 - [测试报告](docs/TEST-REPORT.md)
 - [登录态保持](docs/LOGIN-PERSISTENCE.md)

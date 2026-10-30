@@ -10,6 +10,7 @@ __pycache__/
 build/
 app/.build/
 tools/login_persist/build/
+tools/runtime/build/
 
 # Test artifacts
 *.app

@@ -401,3 +401,32 @@ AXApplication 微信
 - 42 个构建中只有 270115 做了真实撤回测试；
 - 其余构建的地址来自 zengtianli/WeChatTweak 的公开配置（AGPL-3.0），
   已做格式和原始字节校验，但未逐一在真机启动验证。
+
+---
+
+## 14. v0.1.5：窗口隐私与主题（2026-10-30）
+
+### 14.1 窗口隐私
+
+- 新增 `libExtraWeChatRuntime.dylib`，通过 `DYLD_INSERT_LIBRARIES` 注入补丁副本；
+- hook `NSWindow` 创建 / orderFront / orderWindow / setSharingType，并监听窗口事件；
+- 用 `CGWindowListCopyWindowInfo` 对比：
+  - 未注入：微信主窗口和聊天窗口 `kCGWindowSharingState=1`；
+  - 注入后：主窗口 / 聊天窗口变为 `0`；
+  - 屏幕顶部 33px 的系统菜单栏窗口仍为 `1`，不属于聊天内容；
+- 未修改 `/Applications/WeChat.app`，不涉及 TCC / root。
+
+限制：录屏/共享软件和 macOS 版本可能影响效果，不能当作安全保证。
+
+### 14.2 主题
+
+- 新增 `AppTheme`：微信绿、深海蓝、日落橙、紫罗兰、石墨灰；
+- 主题影响侧栏、卡片、按钮、页面背景和增强页图标；
+- 设置页提供主题卡片选择；
+- 深色模式实际检查，浅色模式沿用同一套基础色 + accent。
+
+### 14.3 尚未完成
+
+- 自定义撤回提示、撤回记录、关键词提醒仍为规划中；
+- 自动领红包未纳入默认计划（资金自动化风险高）；
+- 主题浅色模式和 0.1.5 截图待补。
