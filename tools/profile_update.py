@@ -26,16 +26,18 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import time
-import urllib.error
-import urllib.request
 
 DEFAULT_URL = (
-    "https://raw.githubusercontent.com/Verlintas/ExtraWeChat/main/"
-    "tools/revoke_profiles.json"
+    "https://api.github.com/repos/Verlintas/ExtraWeChat/contents/"
+    "tools/revoke_profiles.json?ref=main"
 )
-DEFAULT_SHA_URL = DEFAULT_URL + ".sha256"
+DEFAULT_SHA_URL = (
+    "https://api.github.com/repos/Verlintas/ExtraWeChat/contents/"
+    "tools/revoke_profiles.json.sha256?ref=main"
+)
 LOCAL_DIR = os.path.expanduser(
     "~/Library/Application Support/ExtraWeChat/profiles"
 )
@@ -109,12 +111,24 @@ def validate_doc(doc: dict) -> tuple[int, int]:
 
 
 def fetch(url: str, timeout: int = 20) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "ExtraWeChat-profile-updater/1.0"},
+    # Use the system curl so HTTPS trust follows macOS Keychain / system roots.
+    # /usr/bin/python3 from older CLT installs may not have a CA bundle.
+    result = subprocess.run(
+        [
+            "/usr/bin/curl",
+            "--fail",
+            "--silent",
+            "--show-error",
+            "--location",
+            "--max-time", str(timeout),
+            "--header", "Accept: application/vnd.github.raw",
+            "--header", "User-Agent: ExtraWeChat-profile-updater",
+            url,
+        ],
+        check=True,
+        capture_output=True,
     )
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return response.read()
+    return result.stdout
 
 
 def remote_sha(url: str) -> str:
@@ -229,7 +243,7 @@ def main() -> int:
             result = update(args.from_file)
         else:
             result = check(args.from_file)
-    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as error:
+    except (subprocess.CalledProcessError, TimeoutError, ValueError, OSError) as error:
         result = {"status": "error", "error": str(error)}
 
     public = {k: v for k, v in result.items() if k != "doc"}
