@@ -501,8 +501,9 @@ AXApplication 微信
 - `python3 -m unittest discover -s tests` 共 15 项通过；
 - 构建表、远程配置、SHA、边缘情况和签名几何均覆盖。
 
-### 17.4 待验证
+### 17.4 验证结果
 
-- 远程 GitHub URL 在发布后实际拉取；
-- GUI「检查适配更新」按钮的真实网络路径；
-- GUI「切换模式」菜单在副本退出后的实际点击。
+- 远程 GitHub API 拉取、SHA 校验和安装到本地 profiles 已验证；
+- CLI `switch_mode.py` 双向切换、locator 状态和签名验证通过；
+- GUI「检查适配更新」按钮和「切换模式」菜单已接入同一工具，待人工点击验收；
+- raw.githubusercontent.com 在当前网络被重置，已改用 `api.github.com` + `Accept: application/vnd.github.raw`。
