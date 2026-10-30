@@ -5,6 +5,12 @@ name: Build ExtraWeChat
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'app/**'
+      - 'tools/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/build.yml'
   workflow_dispatch:
   release:
     types: [ published ]

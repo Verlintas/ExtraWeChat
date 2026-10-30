@@ -1,6 +1,13 @@
 ![ExtraWeChat](Github_readmeTop_EWC.png)
 
+[![Build](https://github.com/Verlintas/ExtraWeChat/actions/workflows/build.yml/badge.svg)](https://github.com/Verlintas/ExtraWeChat/actions/workflows/build.yml)
+[![Website](https://github.com/Verlintas/ExtraWeChat/actions/workflows/site.yml/badge.svg)](https://github.com/Verlintas/ExtraWeChat/actions/workflows/site.yml)
+[![Release](https://img.shields.io/github/v/release/Verlintas/ExtraWeChat?display_name=tag&label=release)](https://github.com/Verlintas/ExtraWeChat/releases/latest)
+[![License](https://img.shields.io/badge/license-AGPL--3.0--only-blue)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Apple%20Silicon-black)](docs/COMPATIBILITY.md)
+
 **给新版 macOS 微信重新实现「微信小助手」核心功能的工具。**
+官网：<https://verlintas.dev/ExtraWeChat/> · 下载：<https://github.com/Verlintas/ExtraWeChat/releases/latest>
 
 旧项目 [TKkk-iOSer/WeChatPlugin-MacOS](https://github.com/TKkk-iOSer/WeChatPlugin-MacOS) 依赖
 Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基于 4.x 的实际结构重新实现：
@@ -206,6 +213,10 @@ open http://localhost:8000
 - [测试报告](docs/TEST-REPORT.md)
 - [登录态保持](docs/LOGIN-PERSISTENCE.md)
 - [路线图](docs/ROADMAP.md)
+- [贡献指南](CONTRIBUTING.md)
+- [安全策略](SECURITY.md)
+- [更新日志](CHANGELOG.md)
+- [引用信息](CITATION.cff)
 
 ## 目录
 
@@ -213,7 +224,16 @@ open http://localhost:8000
 - `tools/`：定位/安装/副本/登录态脚本
 - `tools/login_persist/`：登录态 dylib + Frida 诊断原型
 - `docs/`：可行性、测试、补丁点、登录态、路线图
-- `scripts/`：构建 GUI / 图标 / Release
+- `site/`：官网静态站
+- `scripts/`：构建 GUI / 图标 / Release / 官网部署
+
+## 贡献
+
+欢迎提交构建号适配、边缘情况修复和文档改进。请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+- 不要在 issue / PR 中上传 `login_keys.tsv`、聊天记录或完整微信二进制；
+- 安全漏洞请走私密报告：[SECURITY.md](SECURITY.md)；
+- 版本变化见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 致谢 / 许可
 

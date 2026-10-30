@@ -1,0 +1,80 @@
+name: Bug report
+description: 报告可复现的问题（不要上传 key、聊天记录或完整微信二进制）
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请先确认使用的是最新版，并且问题能在补丁副本中复现。
+        不要在 issue 中粘贴 `login_keys.tsv`、聊天内容或完整 `wechat.dylib`。
+  - type: input
+    id: macos
+    attributes:
+      label: macOS 版本
+      placeholder: "例如 27.0.1 (26A434)"
+    validations:
+      required: true
+  - type: input
+    id: extrawechat
+    attributes:
+      label: ExtraWeChat 版本
+      placeholder: "例如 0.1.7 (8)"
+    validations:
+      required: true
+  - type: input
+    id: wechat
+    attributes:
+      label: 微信版本 / 构建号
+      placeholder: "例如 4.1.15 / 270115"
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: 微信渠道
+      options:
+        - App Store
+        - 官网版
+        - 不确定
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 防撤回模式
+      options:
+        - silent
+        - keeptip
+        - 未开启 / 其他
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 退出原微信
+        2. 创建补丁副本
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果 / 实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 开发者报告（可选）
+      description: 开发者页 →「复制报告」。请先检查并删掉不希望公开的路径信息。
+      render: text
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我没有上传 key、聊天内容或完整微信二进制
+          required: true
+        - label: 我已尝试最新版本
+          required: true

@@ -1,0 +1,73 @@
+name: 兼容性 / 新构建号
+description: 提交未适配或需要验证的微信构建号
+title: "[Compatibility] "
+labels: ["compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先运行 `python3 tools/locate_revoke.py --app /Applications/WeChat.app`，
+        或在「开发者」页复制报告。不要上传完整 `wechat.dylib`。
+  - type: input
+    id: macos
+    attributes:
+      label: macOS 版本
+      placeholder: "例如 27.0.1"
+    validations:
+      required: true
+  - type: input
+    id: wechat
+    attributes:
+      label: 微信版本 / 构建号
+      placeholder: "例如 4.1.15.55 / 270135"
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: 微信渠道
+      options:
+        - App Store
+        - 官网版
+        - 不确定
+    validations:
+      required: true
+  - type: dropdown
+    id: arch
+    attributes:
+      label: Mac 架构
+      options:
+        - Apple Silicon (arm64)
+        - Intel (x86_64)
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: locator
+    attributes:
+      label: 定位器输出
+      description: 运行 `locate_revoke.py --app ...` 或使用 `--json` 的输出。
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: dylib_sha
+    attributes:
+      label: wechat.dylib SHA-256
+      description: "`shasum -a 256 /Applications/WeChat.app/Contents/Resources/wechat.dylib`"
+  - type: dropdown
+    id: recall
+    attributes:
+      label: 真实撤回测试
+      options:
+        - 已在副本中测试并通过
+        - 已在副本中测试但失败
+        - 尚未测试
+        - 无法测试
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我没有上传完整微信二进制、聊天内容或 key
+          required: true

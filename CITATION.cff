@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "如果 ExtraWeChat 对你的研究或项目有帮助，可以这样引用。"
+title: "ExtraWeChat"
+abstract: "微信 4.x macOS 本地增强工具：防撤回、补丁副本、多开、窗口隐私和主题。"
+authors:
+  - family-names: "Verlintas"
+    alias: "Verlintas"
+repository-code: "https://github.com/Verlintas/ExtraWeChat"
+url: "https://verlintas.dev/ExtraWeChat/"
+license: "AGPL-3.0-only"
+type: software
+version: "0.1.7"
+date-released: "2026-10-30"
+keywords:
+  - macOS
+  - WeChat
+  - anti-revoke
+  - Apple Silicon
+  - SwiftUI
