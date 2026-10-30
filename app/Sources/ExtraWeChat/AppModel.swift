@@ -22,6 +22,7 @@ final class AppModel: ObservableObject {
     @Published var patchedCopyBuild: String?
     @Published var patchedCopyPatchState: String?
     @Published var patchedCopySupportsDYLD = false
+    @Published var copyBackups: [CopyBackupInfo] = []
     @Published var windowPrivacy: Bool {
         didSet { UserDefaults.standard.set(windowPrivacy, forKey: "windowPrivacy") }
     }
@@ -133,6 +134,12 @@ final class AppModel: ObservableObject {
     var patchedCopyMarker: URL {
         dataDir.appendingPathComponent("patched-copy.json")
     }
+
+    var copyBackupsDir: URL {
+        dataDir.appendingPathComponent("backups/copies", isDirectory: true)
+    }
+
+    var latestCopyBackup: CopyBackupInfo? { copyBackups.first }
 
     var profilesPath: URL? {
         toolsDir?.appendingPathComponent("revoke_profiles.json")
@@ -861,6 +868,67 @@ final class AppModel: ObservableObject {
         guard let current = info?.build, build != current else { return }
         toast = "微信已更新到 \(build)，请重建补丁副本"
         await refresh()
+    }
+
+    func refreshCopyBackups() async {
+        guard patchedCopyExists else {
+            copyBackups = []
+            return
+        }
+        if let output = try? await runPython("backup_copy.py", ["list", "--json"]),
+           let data = output.data(using: .utf8),
+           let items = try? JSONDecoder().decode([CopyBackupInfo].self, from: data) {
+            copyBackups = items
+        }
+    }
+
+    func createCopyBackup() async {
+        guard patchedCopyExists else {
+            errorMessage = "还没有补丁副本。"
+            return
+        }
+        if isRunning(appPath: patchedCopyPath.path) {
+            errorMessage = "补丁副本正在运行。请先退出副本，再创建备份。"
+            return
+        }
+        await perform("正在备份补丁副本…") {
+            try await self.runPython("backup_copy.py", ["create", "--json"])
+        }
+        await refreshCopyBackups()
+        if errorMessage == nil {
+            toast = "补丁副本已备份"
+        }
+    }
+
+    func restoreLatestCopyBackup() async {
+        guard patchedCopyExists else {
+            errorMessage = "还没有补丁副本。"
+            return
+        }
+        if isRunning(appPath: patchedCopyPath.path) {
+            errorMessage = "补丁副本正在运行。请先退出副本，再恢复备份。"
+            return
+        }
+        if isRunning(appPath: wechatPath) {
+            errorMessage = "原微信仍在运行。请先完全退出原微信，再恢复备份。"
+            return
+        }
+        guard latestCopyBackup != nil else {
+            errorMessage = "还没有可用的副本备份。"
+            return
+        }
+        await perform("正在恢复补丁副本…") {
+            try await self.runPython("backup_copy.py", ["restore", "--latest", "--json"])
+        }
+        if errorMessage == nil {
+            toast = "补丁副本已恢复"
+            launchPatchedCopy()
+        }
+    }
+
+    func openCopyBackupsFolder() {
+        try? FileManager.default.createDirectory(at: copyBackupsDir, withIntermediateDirectories: true)
+        NSWorkspace.shared.open(copyBackupsDir)
     }
 
     func checkProfileUpdates() async {

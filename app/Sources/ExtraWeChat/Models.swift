@@ -107,6 +107,26 @@ struct InstallStatus: Decodable, Equatable {
     var error: String?
 }
 
+struct CopyBackupInfo: Decodable, Identifiable, Equatable {
+    var name: String
+    var created_at: Int
+    var build: String?
+    var short_version: String?
+    var size_bytes: Int?
+    var path: String?
+
+    var id: String { name }
+    var displayDate: String {
+        let date = Date(timeIntervalSince1970: TimeInterval(created_at))
+        return DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
+    }
+    var displaySize: String {
+        let bytes = size_bytes ?? 0
+        if bytes <= 0 { return "—" }
+        return ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+    }
+}
+
 struct InstanceInfo: Identifiable, Equatable {
     var id: String
     var name: String

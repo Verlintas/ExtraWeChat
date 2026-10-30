@@ -31,7 +31,7 @@ cp "$ROOT/app/Resources/MenuBarIcon.png" "$APP/Contents/Resources/MenuBarIcon.pn
 
 # Python engine (install / patch / locate) + build/profile table
 cp "$ROOT/tools/install.py" "$ROOT/tools/patch_copy.py" "$ROOT/tools/locate_revoke.py" \
-   "$ROOT/tools/profile_update.py" "$ROOT/tools/switch_mode.py" \
+   "$ROOT/tools/profile_update.py" "$ROOT/tools/switch_mode.py" "$ROOT/tools/backup_copy.py" \
    "$ROOT/tools/revoke_profiles.json" "$APP/Contents/Resources/tools/"
 chmod 755 "$APP/Contents/Resources/tools/"*.py
 

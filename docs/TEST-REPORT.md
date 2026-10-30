@@ -517,3 +517,31 @@ AXApplication 微信
 - 刷新后副本卡片和菜单栏显示「副本需要更新」；
 - 不启动额外进程、不上传信息、不需要账号；
 - 定时器只在主窗口存在时运行。
+
+---
+
+## 19. v0.2.0：副本备份 / 恢复（2026-10-30）
+
+### 19.1 功能
+
+- 增强页新增「副本备份」；
+- 备份 `~/Applications/WeChatExtra.app`，不复制聊天数据 / key；
+- APFS `cp -cR` clone，非 APFS 退回 `ditto`；
+- 支持 create / list / restore / delete；
+- 恢复前把当前 App 移走，失败回退；
+- 恢复后自动启动副本。
+
+### 19.2 测试
+
+- 使用临时 fake `.app` 测试 create → list → restore → delete；
+- 检查目录穿越名称被 safe_name 处理；
+- `python3 -m unittest discover -s tests` 共 17 项通过。
+
+### 19.3 真实验证
+
+- 临时退出 1.4GB 补丁副本后创建备份，`cp -cR` APFS clone 用时约 0.18 秒；
+- 备份 manifest 记录 build 270115、逻辑大小 1,467,162,624 字节；
+- 恢复用时约 2.85 秒，恢复后 `codesign --verify --deep --strict` 通过；
+- locator 显示 `pristine / patched-keeptip`，与备份时一致；
+- 旧 App 的 `.before-restore-*` 回退目录已清理；
+- GUI 备份按钮和菜单的实际点击仍待人工验收。

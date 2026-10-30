@@ -6,12 +6,14 @@ import SwiftUI
 struct EnhancementsView: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.appTheme) private var theme
+    @State private var showRestoreBackupConfirm = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
                 privacyCard
+                backupCard
                 roadmapCard
                 if !model.log.isEmpty {
                     Card("最近一次操作", icon: "terminal") {
@@ -20,6 +22,15 @@ struct EnhancementsView: View {
                 }
             }
             .padding(24)
+        }
+        .task { await model.refreshCopyBackups() }
+        .alert("恢复最近备份？", isPresented: $showRestoreBackupConfirm) {
+            Button("取消", role: .cancel) {}
+            Button("恢复", role: .destructive) {
+                Task { await model.restoreLatestCopyBackup() }
+            }
+        } message: {
+            Text("会用最近一次备份替换 ~/Applications/WeChatExtra.app。只替换 App，不会动聊天数据；恢复后会自动启动副本。")
         }
     }
 
@@ -104,6 +115,68 @@ struct EnhancementsView: View {
             }
 
             Text("限制：这是 macOS 的窗口属性，效果取决于录屏/共享软件；通知横幅和屏幕外的内容不受影响，不能当作安全保证。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var backupCard: some View {
+        Card("副本备份", icon: "externaldrive.badge.timemachine") {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("备份补丁副本")
+                        .font(.headline)
+                    Text("只备份 ~/Applications/WeChatExtra.app，不复制聊天记录、媒体或 key。")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                StatusPill(
+                    text: model.copyBackups.isEmpty ? "无备份" : "\(model.copyBackups.count) 个",
+                    color: model.copyBackups.isEmpty ? .secondary : .blue
+                )
+            }
+
+            if let latest = model.latestCopyBackup {
+                Divider()
+                KeyValueRow(key: "最近备份", value: "\(latest.displayDate) · \(latest.displaySize)")
+                KeyValueRow(key: "构建号", value: latest.build ?? "—")
+            }
+
+            if model.patchedCopyRunning {
+                Text("补丁副本正在运行。备份/恢复前请先退出副本。")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    Task { await model.createCopyBackup() }
+                } label: {
+                    Label("创建备份", systemImage: "plus.square.on.square")
+                }
+                .buttonStyle(.bordered)
+                .disabled(model.busy || !model.patchedCopyExists || model.patchedCopyRunning)
+
+                Button {
+                    showRestoreBackupConfirm = true
+                } label: {
+                    Label("恢复最近备份", systemImage: "arrow.uturn.backward")
+                }
+                .buttonStyle(.bordered)
+                .disabled(model.busy || !model.patchedCopyExists || model.patchedCopyRunning || model.info?.running == true || model.copyBackups.isEmpty)
+
+                Button {
+                    model.openCopyBackupsFolder()
+                } label: {
+                    Label("打开目录", systemImage: "folder")
+                }
+
+                Spacer()
+            }
+
+            Text("使用 APFS clone 时几乎不占额外空间；非 APFS 会自动退回普通复制。恢复只替换 App，不改动共享聊天数据。")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

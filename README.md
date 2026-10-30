@@ -32,13 +32,13 @@ Objective-C 注入，微信 4.x 改为 Qt/C++ 后已整体失效。本项目基�
 
 从 GitHub Releases 下载：
 
-- **`ExtraWeChat-0.1.9-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
-- `ExtraWeChat-0.1.9-arm64.zip`：便携版，解压后运行。
+- **`ExtraWeChat-0.2.0-arm64.pkg`（推荐）**：双击安装到 `/Applications`；
+- `ExtraWeChat-0.2.0-arm64.zip`：便携版，解压后运行。
 
 pkg 未公证，若被 Gatekeeper 拦截，右键 → 打开，或：
 
 ```bash
-sudo installer -pkg ~/Downloads/ExtraWeChat-0.1.9-arm64.pkg -target /
+sudo installer -pkg ~/Downloads/ExtraWeChat-0.2.0-arm64.pkg -target /
 ```
 
 zip 版首次打开前：
@@ -55,8 +55,8 @@ open ExtraWeChat.app
 ./scripts/build_pkg.sh
 # 产物：
 #   build/ExtraWeChat.app
-#   build/ExtraWeChat-0.1.9-arm64.zip
-#   build/ExtraWeChat-0.1.9-arm64.pkg
+#   build/ExtraWeChat-0.2.0-arm64.zip
+#   build/ExtraWeChat-0.2.0-arm64.pkg
 ```
 
 要求：**Apple Silicon（arm64）**、macOS 13+、Xcode Command Line Tools、`/usr/bin/python3`（或 Python 3）。
@@ -174,6 +174,7 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 | 适配表远程更新 | ✅ 从 main 分支拉取并校验 SHA，无需等新版 App |
 | 秒级切换模式 | ✅ 原地改写副本 dylib + 重签，约 1 秒 |
 | 微信更新守护 | ✅ 后台检查主微信构建号，变化时提示重建副本 |
+| 副本备份 / 恢复 | ✅ APFS clone 备份补丁副本，只替换 App，不动聊天数据 |
 | 多开（独立数据目录） | ✅ 副本启动验证通过；GUI 已封装 |
 | 备份 / 还原 / 诊断 | ✅ 已实现 |
 | 菜单栏 / GUI / 主题 | ✅ 已实现（ad-hoc 签名，未公证） |
@@ -212,6 +213,7 @@ open http://localhost:8000
 - [微信 / macOS 兼容性](docs/COMPATIBILITY.md)
 - [增强功能与运行时组件](docs/ENHANCEMENTS.md)
 - [开发者页与适配](docs/DEVELOPER.md)
+- [副本备份 / 恢复](docs/BACKUP.md)
 - [270115 补丁点](docs/PATCH-270115.md)
 - [测试报告](docs/TEST-REPORT.md)
 - [登录态保持](docs/LOGIN-PERSISTENCE.md)
