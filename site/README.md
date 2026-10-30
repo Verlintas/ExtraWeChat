@@ -12,7 +12,7 @@ open http://localhost:8000
 ## 文件
 
 - `index.html` — 页面内容
-- `assets/style.css` — 样式与 5 套主题
+- `assets/style.css` — 样式（微信绿）
 - `assets/app.js` — 主题切换、滚动动画、截图灯箱
 - `assets/screenshots/*.webp` — 界面截图
 - `assets/icon-*.png` — App 图标
@@ -38,4 +38,4 @@ rsync -av --delete site/ user@server:/var/www/verlintas.dev/ExtraWeChat/
 - 版本号写在 `index.html` 的 hero badge/Release 链接中（当前指向 GitHub Releases latest，不写死版本）；
 - 兼容性表在 `index.html` 的 `#compatibility` 和 `docs/COMPATIBILITY.md`；
 - 更新截图时替换 `assets/screenshots/*.webp`，保持文件名不变；
-- 主题色在 `assets/style.css` 的 `:root[data-theme=...]` 中修改。
+- 主题色在 `assets/style.css` 的 `:root` 中修改。

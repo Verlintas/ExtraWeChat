@@ -4,31 +4,6 @@
 (function () {
   "use strict";
 
-  var root = document.documentElement;
-  var themes = ["wechat", "ocean", "sunset", "violet", "graphite"];
-  var dots = Array.prototype.slice.call(document.querySelectorAll(".theme-dot"));
-
-  function setTheme(name, persist) {
-    if (themes.indexOf(name) === -1) name = "wechat";
-    root.dataset.theme = name;
-    dots.forEach(function (dot) {
-      dot.classList.toggle("active", dot.dataset.theme === name);
-    });
-    if (persist) {
-      try { localStorage.setItem("extrawechat-site-theme", name); } catch (e) {}
-    }
-  }
-
-  var saved = null;
-  try { saved = localStorage.getItem("extrawechat-site-theme"); } catch (e) {}
-  setTheme(saved || "wechat", false);
-
-  dots.forEach(function (dot) {
-    dot.addEventListener("click", function () {
-      setTheme(dot.dataset.theme, true);
-    });
-  });
-
   var nav = document.getElementById("nav");
   function onScroll() {
     if (!nav) return;
