@@ -111,7 +111,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
           </div>
           <h3>补丁副本</h3>
-          <p>复制到 <code>~/Applications</code> 后打补丁。不修改系统微信，不需要 root 或 App 管理权限。</p>
+          <p>复制到 <code>~/Applications</code> 后打补丁。不修改系统微信，不需要 root 或 App 管理权限；支持一键备份/恢复。</p>
           <span class="tag">推荐路径</span>
         </article>
 
@@ -166,7 +166,7 @@
       <div class="steps">
         <div class="step reveal"><span class="step-num">01</span><div><h3>退出原微信</h3><p>⌘Q 并等待 helper 退出。副本与原微信不能同时运行。</p></div></div>
         <div class="step reveal"><span class="step-num">02</span><div><h3>创建补丁副本</h3><p>选择静默或保留提示，ExtraWeChat 复制、打补丁并重签。</p></div></div>
-        <div class="step reveal"><span class="step-num">03</span><div><h3>正常使用</h3><p>从副本登录同一账号，聊天记录还在；微信更新后一键重建。</p></div></div>
+        <div class="step reveal"><span class="step-num">03</span><div><h3>正常使用</h3><p>从副本登录同一账号，聊天记录还在；需要时从备份恢复 App，微信更新后一键重建。</p></div></div>
       </div>
     </section>
 
@@ -191,7 +191,7 @@
         </figure>
         <figure class="shot reveal wide">
           <img src="assets/screenshots/enhancements.webp" alt="ExtraWeChat 增强与窗口隐私" decoding="async" width="1600" height="1146">
-          <figcaption><strong>增强</strong><span>窗口隐私和后续功能规划</span></figcaption>
+          <figcaption><strong>增强 / 备份</strong><span>窗口隐私、副本备份和后续功能规划</span></figcaption>
         </figure>
       </div>
     </section>
@@ -265,7 +265,12 @@
         </details>
         <details>
           <summary>微信更新后怎么办？</summary>
-          <p>打开 ExtraWeChat →「消息防撤回」。如果检测到主微信构建号变化，会提示副本需要更新；点「更新并启动」重建即可，聊天记录不会丢失。</p>
+          <p>打开 ExtraWeChat →「消息防撤回」。如果检测到主微信构建号变化，会提示副本需要更新；点「更新并启动」重建即可，聊天记录不会丢失。重建前也可以先在「增强 → 副本备份」留一份 App 备份。</p>
+        </details>
+
+        <details>
+          <summary>备份会包含聊天记录吗？</summary>
+          <p>不会。副本备份只复制 <code>~/Applications/WeChatExtra.app</code>，不包含聊天数据、媒体或登录 key。恢复也只替换 App，不动共享的微信数据容器。</p>
         </details>
         <details>
           <summary>支持哪些微信和 macOS？</summary>
