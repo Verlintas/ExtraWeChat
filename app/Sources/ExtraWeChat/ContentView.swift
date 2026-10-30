@@ -14,6 +14,22 @@ struct ContentView: View {
                     sidebarRow(section)
                 }
                 Spacer(minLength: 12)
+                Button {
+                    model.openSettings()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "gearshape")
+                            .frame(width: 18)
+                        Text("设置")
+                        Spacer(minLength: 0)
+                    }
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 sidebarFooter
             }
             .padding(12)
@@ -39,6 +55,12 @@ struct ContentView: View {
                             ProgressView()
                                 .controlSize(.small)
                         }
+                        Button {
+                            model.openSettings()
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .help("设置")
                         Button {
                             Task { await model.refresh() }
                         } label: {
@@ -140,9 +162,23 @@ struct ContentView: View {
                     .foregroundStyle(.tertiary)
             }
             Spacer()
-            Circle()
-                .fill(model.theme.accent)
-                .frame(width: 8, height: 8)
+            Menu {
+                ForEach(AppTheme.allCases) { theme in
+                    Button {
+                        model.theme = theme
+                    } label: {
+                        Label(theme.name, systemImage: model.theme == theme ? "checkmark.circle.fill" : "circle")
+                    }
+                }
+            } label: {
+                Image(systemName: "paintpalette.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(model.theme.accent)
+                    .frame(width: 22, height: 22)
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .help("切换主题")
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 8)

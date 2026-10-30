@@ -27,7 +27,7 @@ struct ExtraWeChatApp: App {
                 }
             }
 
-            CommandMenu("ExtraWeChat") {
+            CommandMenu("微信") {
                 Button("刷新状态") {
                     Task { await model.refresh() }
                 }

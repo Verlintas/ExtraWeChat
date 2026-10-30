@@ -790,6 +790,13 @@ final class AppModel: ObservableObject {
         NSWorkspace.shared.open(backupDir)
     }
 
+    func openSettings() {
+        NSApp.activate(ignoringOtherApps: true)
+        if !NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) {
+            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+        }
+    }
+
     func openAppManagementSettings() {
         let candidates = [
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_AppBundles",
