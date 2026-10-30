@@ -17,18 +17,23 @@ open http://localhost:8000
 - `assets/screenshots/*.webp` — 界面截图
 - `assets/icon-*.png` — App 图标
 
-## 部署到 verlintas.dev/ExtraWeChat/
+## 已部署
 
-把 `site/` 目录内容上传到 `verlintas.dev` 的 `/ExtraWeChat/` 路径即可，例如：
+- 地址：<https://verlintas.dev/ExtraWeChat/>
+- 托管：GitHub Pages（`gh-pages` 分支）
+- 更新：
+
+```bash
+./scripts/deploy_site.sh
+```
+
+这会用当前 `site/` 目录内容强制更新 `gh-pages` 分支，并由 GitHub Pages 自动发布。
+
+也可以手动部署到自己的服务器，例如：
 
 ```bash
 rsync -av --delete site/ user@server:/var/www/verlintas.dev/ExtraWeChat/
 ```
-
-或者使用 Cloudflare Pages / GitHub Pages：
-
-- **Cloudflare Pages**：构建目录填 `site`，不需要构建命令；
-- **GitHub Pages**：把 `site/` 发布到 `gh-pages` 分支，或使用 Pages 的 “Deploy from a branch → /docs” 方式（需要把 `site` 改名为 `docs` 或配置自定义目录）。
 
 > 如果使用自定义域名 `verlintas.dev/ExtraWeChat/`，请确认服务器把该路径指向本目录，
 > 并给 `assets/` 设置长期缓存、`index.html` 设置短缓存。

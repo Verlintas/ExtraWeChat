@@ -185,6 +185,8 @@ EXTRAWECHAT_LOGIN_DEBUG=1 tools/login_persist/run.sh ~/Applications/WeChat-Login
 
 ## 官网
 
+在线地址：<https://verlintas.dev/ExtraWeChat/>
+
 官网源码在 [`site/`](site/)，是一个无构建步骤的静态单页：
 
 ```bash
